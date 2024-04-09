@@ -3,7 +3,7 @@
  * ** author  : Flappyowl Foundation
  * ** package : @contracts/ERC721/FlappyOwlVault.sol
  */
-pragma solidity 0.8.17;
+pragma solidity ^0.8.20;
 
 import "../interfaces/IFlappyOwlNftTestnet.sol";
 import "../interfaces/IFlappyRewardCoin.sol";

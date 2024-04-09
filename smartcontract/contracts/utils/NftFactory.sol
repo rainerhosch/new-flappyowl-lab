@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /*
  * ** author  : Flappyowl Foundation
- * ** package : @contracts/ERC721/NftDescriptor.sol
+ * ** package : @contracts/ERC721/NftFactory.sol
  */
-pragma solidity 0.8.17;
+pragma solidity ^0.8.20;
 
-import "../lib/base64.sol";
+import "../libraries/base64.sol";
 import "../interfaces/INftFactory.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
   
-contract NftDescriptor is INftFactory {
+contract NftFactory is INftFactory {
         struct Color {
         string value;
         string name;

@@ -5,7 +5,7 @@
  * ** package : @contracts/interfaces/INftFactory.sol
  */
 
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 
 interface INftFactory {
     function tokenURI(
