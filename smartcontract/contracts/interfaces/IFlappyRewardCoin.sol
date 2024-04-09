@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 /*
- * ** author  : flappyowl.fun
+ * ** author  : flappyowl foundation
  * ** package : @contracts/ERC721/IFlappyRewardCoin.sol
  */
 pragma solidity ^0.8.20;
 
-interface IFlappyRewardCoin {
+
+interface IFlappyRewardCoin{
+    
     function totalSupply() external view returns (uint256);
 
     function balanceOf(address account) external view returns (uint256);
@@ -25,7 +27,7 @@ interface IFlappyRewardCoin {
         uint256 amount
     ) external returns (bool);
 
-    function mint(address to, uint256 amount) external;
+    function mint(address to, uint256 amount) external returns (bool);
 
-    function burnFrom(address account, uint256 amount) external;
+    function burnFrom(address account, uint256 amount) external returns (bool);
 }
