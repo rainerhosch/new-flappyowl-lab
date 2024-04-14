@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {IReward} from "../interfaces/IReward.sol";
 
-contract Reward is IReward {
+abstract contract Reward is IReward {
     address public owner;
     uint256 public rewardPerBlock; // 100KFRC for initial reward per block, this will decrease every halving
     uint256 public halvingInterval; // halving set every 10K block
@@ -54,16 +54,18 @@ contract Reward is IReward {
     //     payable(msg.sender).transfer(reward);
     //     emit Claimed(msg.sender, reward);
     // }
-    function claim() external override {
-        updateReward();
-        uint256 reward = calculateReward(msg.sender, block.number, stakedBalance[msg.sender]);
-        require(reward > 0, "No reward to claim");
-        lastClaimBlock[msg.sender] = block.number;
-        // Transfer reward to user
-        // For simplicity, let's assume the reward is in Ether
-        payable(msg.sender).transfer(reward);
-        emit Claimed(msg.sender, reward);
-    }
+
+    
+    // function claim() external override {
+    //     updateReward();
+    //     uint256 reward = calculateReward(msg.sender, block.number, stakedBalance[msg.sender]);
+    //     require(reward > 0, "No reward to claim");
+    //     lastClaimBlock[msg.sender] = block.number;
+    //     // Transfer reward to user
+    //     // For simplicity, let's assume the reward is in Ether
+    //     payable(msg.sender).transfer(reward);
+    //     emit Claimed(msg.sender, reward);
+    // }
 
     function updateReward() internal {
         uint256 currentBlock = block.number;
