@@ -5,10 +5,11 @@
  */
 pragma solidity ^0.8.20;
 
-import "../interfaces/IFlappyOwlNftTestnet.sol";
-import "../interfaces/IFlappyRewardCoin.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import {IFlappyOwlNftTestnet} from "../interfaces/IFlappyOwlNftTestnet.sol";
+import {IFRC} from "../interfaces/IFRC.sol";
+import {ILiquidityPool} from "../interfaces/ILiquidityPool.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FlappyOwlVault is Ownable, IERC721Receiver {
     //--------------------------------------------------------------------
@@ -21,14 +22,17 @@ contract FlappyOwlVault is Ownable, IERC721Receiver {
     uint256 private constant MONTH = 30 days;
 
     IFlappyOwlNftTestnet nft;
-    IFlappyRewardCoin rewardCoin;
+    IFRC rewardCoin;
+    ILiquidityPool liquidityPool;
 
-    struct Stake {
+    struct StakeNft {
         address owner;
         uint256 stakingStartTime;
     }
 
-    mapping(uint256 => Stake) vault;
+    mapping(uint256 => StakeNft) vault;
+    mapping(address => uint256) public stakedNftBalance;
+    mapping(address => uint256) public lastClaimBlock;
 
     //--------------------------------------------------------------------
     // EVENTS
@@ -42,23 +46,29 @@ contract FlappyOwlVault is Ownable, IERC721Receiver {
 
     error FlappyOwlPos__ItemAlreadyStaked();
     error FlappyOwlPos__NotItemOwner();
+    error NotAuthenticNfts();
+    error NotHavePoolPosition();
+    error NotHaveStakedNfts();
 
     //--------------------------------------------------------------------
     // CONSTRUCTOR
 
-    constructor(address _nftAddress, address _tokenAddress) {
+    constructor(address _nftAddress, address _tokenAddress, address _lpStakingAddress) {
         nft = IFlappyOwlNftTestnet(_nftAddress);
-        rewardCoin = IFlappyRewardCoin(_tokenAddress);
+        rewardCoin = IFRC(_tokenAddress);
+        liquidityPool = ILiquidityPool(_lpStakingAddress);
     }
 
     //--------------------------------------------------------------------
     // FUNCTIONS
     function updateVaultInterface(
         address _nftAddress,
-        address _tokenAddress
+        address _tokenAddress,
+        address _lpStakingAddress
     ) external onlyOwner {
-        rewardCoin = IFlappyRewardCoin(_tokenAddress);
+        rewardCoin = IFRC(_tokenAddress);
         nft = IFlappyOwlNftTestnet(_nftAddress);
+        liquidityPool = ILiquidityPool(_lpStakingAddress);
     }
 
     function stake(uint256[] calldata tokenIds) external {
@@ -77,7 +87,7 @@ contract FlappyOwlVault is Ownable, IERC721Receiver {
 
             nft.safeTransferFrom(msg.sender, address(this), tokenId);
 
-            vault[tokenId] = Stake(msg.sender, block.timestamp);
+            vault[tokenId] = StakeNft(msg.sender, block.timestamp);
 
             emit ItemStaked(tokenId, msg.sender, block.timestamp);
 
@@ -259,7 +269,7 @@ contract FlappyOwlVault is Ownable, IERC721Receiver {
             }
         }
     }
-
+    
     function onERC721Received(
         address,
         address,

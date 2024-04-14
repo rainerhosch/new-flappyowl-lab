@@ -46,6 +46,9 @@ contract StakingPool is Ownable {
 
     uint128 internal MAX_POOL_FEE_CAP = 5; // 5% max pool fees
     uint256 internal constant MIN_INITIAL_AMOUNT = 5000000 * 10**18; // 5M tokens is minimum initial stake amount for create pool
+    uint256 public constant BLOCK_REWARD = 10000000 * 10**18; // 10M for first block reward, this will decrease on every 
+    uint256 public constant HALVING_INTERVAL = 210000; // Halving Interval
+    
     mapping(address => Pool) public pools;
     mapping(address => bool) public registedToken;
     mapping(uint256 => mapping(address => uint256)) public balances;
@@ -94,10 +97,17 @@ contract StakingPool is Ownable {
         uint256 _amount,
         uint256 _days
     ) external pure returns (uint256) {
-        // return _amount * _days * REWARD_PER_TOKEN_PER_DAY;
+        return _amount * _days * REWARD_PER_TOKEN_PER_DAY;
+    }
+
+    function _rewardCount(
+        uint256 _amount,
+        uint256 _days
+    ) internal pure returns (uint256){
+        return _amount * _days * REWARD_PER_TOKEN_PER_DAY;
     }
     
-    function poolFeeCalculation(uint _amount, uint _poolFees) internal pure returns (uint) {
+    function poolFeeCalculation(uint _amount, uint _poolFees) internal pure returns (uint256) {
         return (_amount * _poolFees) / 100;
     }
 
@@ -105,12 +115,15 @@ contract StakingPool is Ownable {
         Pool storage pool = pools[_poolId];
         require(pool.stakes[msg.sender].amount > 0, "No stake to withdraw");
 
-        uint amount = pool.stakes[msg.sender].amount;
+        uint256 amount = pool.stakes[msg.sender].amount;
         delete pool.stakes[msg.sender];
 
         // Transfer token ke staker (jika diperlukan)
         // Misalnya, jika Anda memiliki token ERC20:
         // token.transfer(msg.sender, amount);
+        uint256 stakingTime = pool.stakes[msg.sender].startTime - block.timestamp;
+        uint256 newAmount = calculateReward(amount, stakingTime);
+        pool.token.transfer(msg.sender, amount); 
 
         emit Withdrawn(_poolId, msg.sender, amount);
     }

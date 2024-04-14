@@ -26,25 +26,21 @@ contract FlappyRewardCoin is ERC20, ERC20Burnable, Ownable {
     bool public initialMinted;
 
     // addresses
-    address constant FOUNDATION = 0xeE66bda0BC2C9ab72127Ce90944b4048775f5Fd9; // 5% FOR FOUNDATION LONG-TERM ENDOWMENT.
-    address constant PUBLIC_SALE = 0x8e14398d793938a3e17852320CB97d1479a05fEb; // 70% PUBLIC SALE
-    address constant GENESIS_POOL = 0xEE5a230528B70c6CAA1cD17fA54AEA481241deAA; // 15% GENESIS LIQUIDITY POOL.
-    address constant AIRDROP = 0xa977bb7de34298126092738DB59177541Ab6080d; // 10% AIRDROP ALOCATION.
+    address constant FOUNDATION = 0xeE66bda0BC2C9ab72127Ce90944b4048775f5Fd9; // 15% FOR FOUNDATION LONG-TERM ENDOWMENT.
+    address constant AIRDROP = 0x8e14398d793938a3e17852320CB97d1479a05fEb; // 60% AIRDROP ALOCATION.
+    address constant GENESIS_POOL = 0xEE5a230528B70c6CAA1cD17fA54AEA481241deAA; // 25% GENESIS LIQUIDITY POOL.
     address[] public INITIAL_SUPPLY_RECEIVER = [
         FOUNDATION,
-        PUBLIC_SALE,
-        GENESIS_POOL,
-        AIRDROP
+        AIRDROP,
+        GENESIS_POOL
     ];
 
     // allocations as a percentage of total supply
-    uint constant FOUNDATION_ALLOCATION = 5;
-    uint constant PUBLIC_SALE_ALLOCATION = 70;
-    uint constant GENESIS_POOL_ALLOCATION = 15;
-    uint constant AIRDROP_ALLOCATION = 10;
+    uint constant FOUNDATION_ALLOCATION = 15;
+    uint constant GENESIS_POOL_ALLOCATION = 25;
+    uint constant AIRDROP_ALLOCATION = 60;
     uint[] public INITIAL_SUPPLY_ALLOCATION = [
         FOUNDATION_ALLOCATION,
-        PUBLIC_SALE_ALLOCATION,
         GENESIS_POOL_ALLOCATION,
         AIRDROP_ALLOCATION
     ];

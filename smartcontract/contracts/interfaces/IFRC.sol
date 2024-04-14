@@ -6,7 +6,7 @@
 pragma solidity ^0.8.20;
 
 
-interface IFlappyRewardCoin{
+interface IFRC{
     
     function totalSupply() external view returns (uint256);
 
