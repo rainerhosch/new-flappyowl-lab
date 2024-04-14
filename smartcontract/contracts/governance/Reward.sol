@@ -5,8 +5,8 @@ import {IReward} from "../interfaces/IReward.sol";
 
 abstract contract Reward is IReward {
     address public owner;
-    uint256 public rewardPerBlock; // 100KFRC for initial reward per block, this will decrease every halving
-    uint256 public halvingInterval; // halving set every 10K block
+    uint256 public rewardPerBlock = 100_000 * 1  ether; // 100KFRC for initial reward per block, this will decrease every halving
+    uint256 public halvingInterval = 10000; // halving set every 10K block
     uint256 public lastHalvingBlock;
 
     // mapping(address => uint256) public stakedBalance;
@@ -16,11 +16,8 @@ abstract contract Reward is IReward {
     // event Unstaked(address indexed user, uint256 amount);
     // event Claimed(address indexed user, uint256 amount);
 
-    constructor(uint256 _initialRewardPerBlock, uint256 _halvingInterval) {
-        owner = msg.sender;
-        rewardPerBlock = _initialRewardPerBlock;
+    constructor() {
         lastHalvingBlock = block.number;
-        halvingInterval = _halvingInterval;
     }
 
     // modifier onlyOwner() {

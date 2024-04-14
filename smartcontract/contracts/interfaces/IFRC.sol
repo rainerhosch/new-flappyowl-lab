@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 /*
  * ** author  : flappyowl foundation
- * ** package : @contracts/ERC721/IFlappyRewardCoin.sol
+ * ** package : @contracts/interfaces/IFRC.sol
  */
 pragma solidity ^0.8.20;
 
