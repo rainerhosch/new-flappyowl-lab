@@ -8,9 +8,9 @@ pragma solidity ^0.8.20;
 import "../libraries/base64.sol";
 import "../interfaces/INftFactory.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-  
+
 contract NftFactory is INftFactory {
-        struct Color {
+    struct Color {
         string value;
         string name;
     }
@@ -57,8 +57,7 @@ contract NftFactory is INftFactory {
         );
 
         string memory encodedSvg = Base64.encode(bytes(rawSvg));
-        string
-            memory description = "Flappy Owl Testnet.";
+        string memory description = "Flappy Owl Testnet.";
 
         return
             string(

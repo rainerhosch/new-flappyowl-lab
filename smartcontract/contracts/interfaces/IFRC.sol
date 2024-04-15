@@ -1,33 +1,26 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 /*
  * ** author  : flappyowl foundation
  * ** package : @contracts/interfaces/IFRC.sol
  */
-pragma solidity ^0.8.20;
-
-
-interface IFRC{
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+interface IFRC is IERC20 {
+        /*-------------------------------------------------------------------- *
+     * Error
+     * -------------------------------------------------------------------- *
+     */
+    error NotController();
+    error NotMinter();
+    error NotOwner();
     
-    function totalSupply() external view returns (uint256);
+    error ZeroAmount();
+    error ZeroAddress();
+    error InitialSupplyMinted();
 
-    function balanceOf(address account) external view returns (uint256);
-
-    function transfer(address to, uint256 amount) external returns (bool);
-
-    function allowance(
-        address owner,
-        address spender
-    ) external view returns (uint256);
-
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool);
+    event Mint(address indexed _account, uint256 _amount, uint256 _circulating_supply);
 
     function mint(address to, uint256 amount) external returns (bool);
-
-    function burnFrom(address account, uint256 amount) external returns (bool);
+    function controller() external view returns (address);
+    function minter() external view returns (address);
 }

@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
-
+pragma solidity ^0.8.20;
 /*
  * ** author  : flappyowl.fun
  * ** package : @contracts/interfaces/INftFactory.sol
  */
-
-pragma solidity ^0.8.20;
 
 interface INftFactory {
     function tokenURI(

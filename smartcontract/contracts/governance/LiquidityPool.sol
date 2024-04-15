@@ -2,18 +2,25 @@
 pragma solidity ^0.8.20;
 pragma abicoder v2;
 
+/*
+ * ** author  : flappyowl foundation
+ * ** package : @contracts/governance/LiquidityPool.sol
+ */
+
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {TickMath} from "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import {TransferHelper} from "@uniswap/v3-core/contracts/libraries/TransferHelper.sol";
 import {INonfungiblePositionManager} from "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import {IFRC} from "../interfaces/IFRC.sol";
+import {ILiquidityPool} from "../interfaces/ILiquidityPool.sol";
 
-contract LiquidityPool is IERC721Receiver {
+contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     address public constant nonfungiblePositionManager =
         0x1238536071E1c677A632429e3655c799b22cDA52; //contract at spolia testnet
     uint24 public constant poolFee = 3000; // base pool fees is 0.3%
     uint24 public constant taxFee = 10000; // tax from earning LP fees is 1% for inceas base LP
     uint256 public totalPools;
+    uint256 public totalLiquidityStaked;
 
     IFRC internal FRC;
 
@@ -83,6 +90,7 @@ contract LiquidityPool is IERC721Receiver {
         });
 
         totalPools++; // Increment totalPools when a new pool is created
+        totalLiquidityStaked += liquidity; // Increment total liquidity has staked at Pools
         emit PoolCreated(tokenId, owner);
     }
 
@@ -231,11 +239,13 @@ contract LiquidityPool is IERC721Receiver {
         );
         _sendToOwner(tokenId, amount0, amount1);
 
-        if (liquidityToRemove >= liquidity) {
+        if (liquidityToRemove == liquidity) {
             retrieveNFT(tokenId);
             totalPools--;
             emit PoolRemoved(tokenId, owner);
         }
+        //Counter
+        totalLiquidityStaked -= liquidityToRemove;
     }
 
     /// @notice Increases liquidity in the current range
@@ -249,8 +259,9 @@ contract LiquidityPool is IERC721Receiver {
         uint256 amountAdd1
     ) external returns (uint128 liquidity, uint256 amount0, uint256 amount1) {
         address owner = pools[tokenId].owner;
-        uint256 token0 = deposits[tokenId].token0;
-        uint256 token1 = deposits[tokenId].token1;
+        uint256 token0 = pools[tokenId].token0;
+        uint256 token1 = pools[tokenId].token1;
+        uint256 liquidityBefor = pools[tokenId].liquidity;
         TransferHelper.safeTransferFrom(
             token0,
             msg.sender,
@@ -288,6 +299,9 @@ contract LiquidityPool is IERC721Receiver {
 
         (liquidity, amount0, amount1) = nonfungiblePositionManager
             .increaseLiquidity(params);
+        
+        //counter
+        totalLiquidityStaked += (liquidity-liquidityBefor);
 
         // Remove allowance and refund in both assets.
         if (amount0 < amountAdd0) {
@@ -350,32 +364,50 @@ contract LiquidityPool is IERC721Receiver {
             pool.liquidity,
             pool.token0,
             pool.token1,
-            pool.locked
+            pool.lockedStart,
+            pool.lockedEnd
         );
     }
 
     // get 
     function poolOfAddress(
-        address owner
-    ) external view returns (uint256[] memory) {
-        uint256 count = 0;
-        for (uint256 i = 0; i < pools.length(); i++) {
-            if (pools[i].owner == owner) {
-                count++;
-            }
-        }
-        
-        uint256[] memory poolIds = new uint256[](count);
-        
+        address _owner
+    ) external view returns (tokenId) {
+        uint256 tokenId;
         uint256 index = 0;
         for (uint256 i = 0; i < totalPools; i++) {
-            if (pools[i].owner == owner) {
-                poolIds[index] = i;
+            if (pools[i].owner == _owner) {
+                tokenId = i;
                 index++;
             }
         }
 
-        return poolIds;
+        return tokenId;
+    }
+
+    function totalLiquidityOfPool() external returns (uint256){
+        return totalLiquidityStaked;
+    }
+    function totalPool() external returns (uint256){
+        return totaPools;
+    }
+
+    function getLiquidityLpOf(address user) external returns (uint128){
+        uint256 tokenId;
+        uint128 liquidityOf;
+        uint256 index = 0;
+        for (uint256 i = 0; i < totalPools; i++) {
+            if (pools[i].owner == user) {
+                tokenId = i;
+                index++;
+            }
+        }
+
+        Pool storage pool = pools[tokenId];
+        liquidityOf += pool.liquidity;
+        return liquidityOf;
+
+        // return tokenId;
     }
 
     /// @notice Transfers the NFT to the owner

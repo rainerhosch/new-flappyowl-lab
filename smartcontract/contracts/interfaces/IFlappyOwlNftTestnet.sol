@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 /*
  * ** author  : flappyowl.fun
  * ** package : @contracts/ERC721/IFlappyOwlNftTestnet.sol
  */
-pragma solidity ^0.8.20;
 
 interface IFlappyOwlNftTestnet {
     function balanceOf(address owner) external view returns (uint256 balance);
