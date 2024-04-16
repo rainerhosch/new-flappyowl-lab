@@ -13,10 +13,15 @@ import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {INonfungiblePositionManager} from "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import {IFRC} from "../interfaces/IFRC.sol";
 import {ILiquidityPool} from "../interfaces/ILiquidityPool.sol";
+// import {IWETH} from "@uniswap/v3-periphery/contracts/interfaces/external/IWETH9.sol";
+import {IWETH} from "../interfaces/IWETH.sol";
 
 contract LiquidityPool is IERC721Receiver, ILiquidityPool {
-    address public constant nonfungiblePositionManager =
-        0x1238536071E1c677A632429e3655c799b22cDA52; //contract at spolia testnet
+    // address public constant nonfungiblePositionManager = 0x1238536071E1c677A632429e3655c799b22cDA52; //contract at spolia testnet
+    INonfungiblePositionManager public nonfungiblePositionManager = INonfungiblePositionManager(0x1238536071E1c677A632429e3655c799b22cDA52);
+    IWETH private constant weth = IWETH(0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14);
+
+
     uint24 public constant poolFee = 3000; // base pool fees is 0.3%
     uint24 public constant taxFee = 10000; // tax from earning LP fees is 1% for inceas base LP
     uint256 public totalPools;
@@ -76,7 +81,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             ,
             ,
 
-        ) = INonfungiblePositionManager(nonfungiblePositionManager).positions(tokenId);
+        ) = nonfungiblePositionManager.positions(tokenId);
         
         // Calculate locked end time based on lock duration in years
         uint256 lockedEnd = block.timestamp + (lockYears * 365 days);
@@ -113,7 +118,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
                 amount1Max: type(uint128).max
             });
 
-        (amount0, amount1) = INonfungiblePositionManager(nonfungiblePositionManager).collect(params);
+        (amount0, amount1) = nonfungiblePositionManager.collect(params);
 
         uint256 taxForLP = (amount1 * taxFee) / 100;
         _increaseLiquidityCurrentRange(0, 0, taxForLP);
@@ -170,8 +175,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
                     deadline: block.timestamp
                 });
 
-        (liquidity, amount0, amount1) = INonfungiblePositionManager(nonfungiblePositionManager)
-            .increaseLiquidity(params);
+        (liquidity, amount0, amount1) = nonfungiblePositionManager.increaseLiquidity(params);
         
         //counter
         totalLiquidityStaked += (liquidity-liquidityBefor);
@@ -207,30 +211,26 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
         // For this example, we will provide equal amounts of liquidity in both assets.
         // Providing liquidity in both assets means liquidity will be earning fees and is considered in-range.
         // 5 * 1e6 * 1e18; // 5M FRC for create LP
+        require(FRC.balanceOf(msg.sender) >= _amount0, "Insufficient FRC balace!");
+        require(weth.balanceOf(msg.sender) >= _amount1, "Insufficient WETH balance!");
+
         uint256 amount0ToMint =  _amount0;
         uint256 amount1ToMint = _amount1;
 
         // transfer tokens to contract
-        TransferHelper.safeTransferFrom(
-            address(FRC),
-            msg.sender,
-            address(this),
-            amount0ToMint
-        );
+        TransferHelper.safeTransferFrom(address(FRC),msg.sender,address(this),amount0ToMint);
+        TransferHelper.safeTransferFrom(address(weth), msg.sender, address(this), amount1ToMint);
 
         // Approve the position manager
-        TransferHelper.safeApprove(
-            address(FRC),
-            address(nonfungiblePositionManager),
-            amount0ToMint
-        );
+        TransferHelper.safeApprove(address(FRC), address(nonfungiblePositionManager),amount0ToMint);
+        TransferHelper.safeApprove(address(weth), address(nonfungiblePositionManager), amount1ToMint);
 
         // The values for tickLower and tickUpper may not work for all tick spacings.
         // Setting amount0Min and amount1Min to 0 is unsafe.
         INonfungiblePositionManager.MintParams memory params = INonfungiblePositionManager
             .MintParams({
                 token0: address(FRC),
-                token1: address(0), // ETH address
+                token1: address(weth),
                 fee: poolFee,
                 tickLower: TickMath.MIN_TICK,
                 tickUpper: TickMath.MAX_TICK,
@@ -243,31 +243,22 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             });
 
         // Note that the pool defined by FRC/ETH and fee tier 0.3% must already be created and initialized in order to mint
-        (tokenId, liquidity, amount0, amount1) = INonfungiblePositionManager(nonfungiblePositionManager)
-            .mint(params);
+        (tokenId, liquidity, amount0, amount1) = nonfungiblePositionManager.mint(params);
 
         // Create a deposit
         _createPool(msg.sender, tokenId, _lockYears);
 
         // Remove allowance and refund in both assets.
         if (amount0 < amount0ToMint) {
-            TransferHelper.safeApprove(
-                address(FRC),
-                address(nonfungiblePositionManager),
-                0
-            );
+            TransferHelper.safeApprove(address(FRC),address(nonfungiblePositionManager),0);
             uint256 refund0 = amount0ToMint - amount0;
             TransferHelper.safeTransfer(address(FRC), msg.sender, refund0);
         }
 
         if (amount1 < amount1ToMint) {
-            TransferHelper.safeApprove(
-                address(0),
-                address(nonfungiblePositionManager),
-                0
-            );
+            TransferHelper.safeApprove(address(weth),address(nonfungiblePositionManager),0);
             uint256 refund1 = amount1ToMint - amount1;
-            TransferHelper.safeTransfer(address(0), msg.sender, refund1);
+            TransferHelper.safeTransfer(address(weth), msg.sender, refund1);
         }
     }
 
@@ -312,9 +303,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
                     deadline: block.timestamp
                 });
 
-        (amount0, amount1) = INonfungiblePositionManager(nonfungiblePositionManager).decreaseLiquidity(
-            params
-        );
+        (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(params);
         _sendToOwner(tokenId, amount0, amount1);
 
         if (liquidityToRemove == liquidity) {
@@ -420,10 +409,6 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     function retrieveNFT(uint256 tokenId) internal {
         _collectAllFees(tokenId);
         delete pools[tokenId];
-        INonfungiblePositionManager(nonfungiblePositionManager).safeTransferFrom(
-            address(this),
-            msg.sender,
-            tokenId
-        );
+        nonfungiblePositionManager.safeTransferFrom(address(this),msg.sender,tokenId);
     }
 }

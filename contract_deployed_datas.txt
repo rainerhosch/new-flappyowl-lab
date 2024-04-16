@@ -1,0 +1,19 @@
+NFT Descriptor contract deployed at:
+ 0x1beb46246e73EB696743106BA535Be22dEf1D776
+FlappyOwl NFT contract deployed at:
+ 0xCa7CA399c9c4bebAb7680F25f6C31cd9d67DC67d
+FRC token contract deployed at:
+ 0x0a7d61bE371Af547adb5D9391B35968BF255a23E
+LiquidityPool Contract deployed at:
+ 0x45636D78C64EE21eB2E521e934535aeBC3797D83
+LiquidityPool Contract deployed at:
+ 0xae5fbEcce5C9F01f549C921a42F0E5b9d3741bD0
+FlappyOwl Governor contract deployed at:
+ 0x6C10244Aa43B8E3b38eb1cffdbD059Fe20164F43
+Set Controller :
+ 0x6C10244Aa43B8E3b38eb1cffdbD059Fe20164F43
+Network deployed to :
+ sepolia
+waiting for 6 blocks verification ...
+Verifying contract...
+Nothing to compile

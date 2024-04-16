@@ -59,8 +59,8 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     address constant GENESIS_POOL = 0xEE5a230528B70c6CAA1cD17fA54AEA481241deAA; // 25% GENESIS LIQUIDITY POOL.
     address[] internal INITIAL_SUPPLY_RECEIVER = [
         FOUNDATION,
-        AIRDROP,
-        GENESIS_POOL
+        GENESIS_POOL,
+        AIRDROP
     ];
 
     // allocations as a percentage of total supply
