@@ -13,11 +13,9 @@ import {TransferHelper} from "../libraries/TransferHelper.sol";
 import {INonfungiblePositionManager} from "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import {IFRC} from "../interfaces/IFRC.sol";
 import {ILiquidityPool} from "../interfaces/ILiquidityPool.sol";
-// import {IWETH} from "@uniswap/v3-periphery/contracts/interfaces/external/IWETH9.sol";
 import {IWETH} from "../interfaces/IWETH.sol";
 
 contract LiquidityPool is IERC721Receiver, ILiquidityPool {
-    // address public constant nonfungiblePositionManager = 0x1238536071E1c677A632429e3655c799b22cDA52; //contract at spolia testnet
     INonfungiblePositionManager public nonfungiblePositionManager = INonfungiblePositionManager(0x1238536071E1c677A632429e3655c799b22cDA52);
     IWETH private constant weth = IWETH(0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14);
 
@@ -28,7 +26,6 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     uint256 public totalLiquidityStaked;
 
     IFRC internal FRC;
-    // INonfungiblePositionManager internal nonfungiblePositionManager;
 
     /// @notice Represents the deposit of an NFT
     struct Pool {

@@ -71,6 +71,11 @@ async function main() {
   );
   await control_tx.wait();
   console.log("Set Controller :\n", governorContract.address);
+  const setMinterTx = await tokenContract.set(
+    governorContract.address
+  );
+  await control_tx.wait();
+  console.log("Set Controller :\n", governorContract.address);
   console.log("Network deployed to :\n", deployNetwork);
 
   /* transfer contracts addresses & ABIs to the front-end */

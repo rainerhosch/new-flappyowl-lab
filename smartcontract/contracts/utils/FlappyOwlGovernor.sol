@@ -26,8 +26,6 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     /*--------------------------------------------------------------------
      * EVENTS HANDLER
      *--------------------------------------------------------------------*/
-    // event ItemStaked(uint256 indexed tokenId, address indexed owner, uint256 indexed timestamp);
-    // event ItemUnstaked(uint256 indexed tokenId, address indexed owner, uint256 indexed timestamp);
     event Claimed(address indexed owner, uint256 indexed reward, uint256 indexed blockclaimed);
 
     /*--------------------------------------------------------------------*
