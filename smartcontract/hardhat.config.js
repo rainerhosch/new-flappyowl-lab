@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-etherscan");
 require("@nomicfoundation/hardhat-chai-matchers");
+require("@nomicfoundation/hardhat-verify");
 require("hardhat-gas-reporter");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -20,10 +21,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 
-const RINKEBY_ETHERSCAN_API_KEY = process.env.RINKEBY_ETHERSCAN_API_KEY;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
 const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
 const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL;
 const MUMBAI_RPC_URL = process.env.MUMBAI_RPC_URL;
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL;
@@ -31,16 +32,28 @@ const ACCOUNT = process.env.PRIVATE_KEY;
 
 module.exports = {
   solidity: {
-    compilers: [
-      { version: "0.8.7" },
-      { version: "0.6.6" },
-      { version: "0.8.4" },
-      { version: "0.8.0" },
-      { version: "0.8.8" },
-      { version: "0.8.13" },
-      { version: "0.8.14" },
-      { version: "0.8.17" },
-    ],
+    // compilers: [
+    //   { version: "0.5.0" },
+    //   { version: "0.6.0" },
+    //   { version: "0.7.0" },
+    //   { version: "0.8.0" },
+    //   { version: "0.8.7" },
+    //   { version: "0.6.6" },
+    //   { version: "0.8.4" },
+    //   { version: "0.8.8" },
+    //   { version: "0.8.13" },
+    //   { version: "0.8.14" },
+    //   { version: "0.8.17" },
+    // ]
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+      viaIR: true,
+    },
+
   },
   networks: {
     hardhat: {
@@ -57,17 +70,18 @@ module.exports = {
       chainId: 5,
       blockConfirmations: 6,
     },
+    sepolia: {
+      url: SEPOLIA_RPC_URL,
+      accounts: [ACCOUNT],
+      chainId: 11155111,
+      blockConfirmations: 6,
+    },
     bsctestnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       // gasPrice: 20000000000,
       accounts: [ACCOUNT],
     },
-    // rinkeby: {
-    //   url: RINKEBY_RPC_URL,
-    //   accounts: [ACCOUNT],
-    //   chainId: 4,
-    // }
     // mumbai: {
     //   url: MUMBAI_RPC_URL,
     //   accounts: [ACCOUNT],

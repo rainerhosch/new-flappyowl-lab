@@ -5,7 +5,7 @@
  * ** package : @contracts/ERC721/FlappyOwlNftTestnet.sol
  */
 
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "erc721a/contracts/ERC721A.sol";
@@ -35,7 +35,7 @@ contract FlappyOwlNftTestnet is
     address public beneficiaryAddress;
     address public royaltyAddress;
 
-    constructor(INftFactory newFactory) ERC721A("FlappyOwlNftTestnet", "OWL") {
+    constructor(INftFactory newFactory) ERC721A("FlappyOwlNftTestnet", "OWLT") {
         beneficiaryAddress = owner();
         royaltyAddress = owner();
         factory = newFactory;

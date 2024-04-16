@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.17;
 /*
  * ** author  : flappyowl foundation
  * ** package : @contracts/governance/NftStakingPool.sol
@@ -21,17 +21,13 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
     // address public controller;
     uint256 public totalNftStakingPool;
 
-    mapping(address => bool) controllers;
+    // mapping(address => bool) controllers;
     mapping(uint256 => StakedNft) pools;
     mapping(address => uint256) public stakedNftBalance;
     mapping(address => uint256) public lastClaimBlock;
 
-    constructor(
-        address _nftAddress,
-        address _setController
-    ) {
+    constructor(address _nftAddress) {
         nft = IFlappyOwlNftTestnet(_nftAddress);
-        controllers[_setController] = true;
     }
 
     function stake(uint256[] calldata tokenIds) external {

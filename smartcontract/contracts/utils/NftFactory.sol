@@ -3,7 +3,7 @@
  * ** author  : Flappyowl Foundation
  * ** package : @contracts/ERC721/NftFactory.sol
  */
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.17;
 
 import "../libraries/base64.sol";
 import "../interfaces/INftFactory.sol";
@@ -57,7 +57,7 @@ contract NftFactory is INftFactory {
         );
 
         string memory encodedSvg = Base64.encode(bytes(rawSvg));
-        string memory description = "Flappy Owl Testnet.";
+        string memory description = "Flappy Owl Testnet, this nft is utility ecosystem for mining FRC coin.";
 
         return
             string(

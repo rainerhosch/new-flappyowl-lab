@@ -10,10 +10,13 @@ const {
 async function main() {
   const deployNetwork = hre.network.name;
 
-  // NftFactoryDescriptor is NFT Descriptor contract
-  const DescriptorContract = await ethers.getContractFactory("NftDescriptor");
+  /**------------------------------------------------------------------**
+   * Deploy contract nft image factory
+   */
+  const DescriptorContract = await ethers.getContractFactory("NftFactory");
   const descriptorContract = await DescriptorContract.deploy();
   await descriptorContract.deployed();
+  console.log("NFT Descriptor contract deployed at:\n",descriptorContract.address);
 
   // Deploy FlappyOwlNftTestnet contract
   // const maxSupply = 69069;
@@ -23,41 +26,51 @@ async function main() {
   // const mintingStatus = true;
   // const updatableSeed = true;
 
+  /**------------------------------------------------------------------**
+   * Deploy FlappyOwl NFT token contract
+   */
   const NFTContract = await ethers.getContractFactory("FlappyOwlNftTestnet");
   const nftContract = await NFTContract.deploy(descriptorContract.address);
   await nftContract.deployed();
-
-  // Deploy FlappyRewardCoin ERC20 token contract
-  const TokenContract = await ethers.getContractFactory("FlappyRewardCoin");
+  console.log("FlappyOwl NFT contract deployed at:\n", nftContract.address);
+  /**------------------------------------------------------------------**
+   * Deploy FRC ERC20 token contract
+   */
+  const TokenContract = await ethers.getContractFactory("FRC");
   const tokenContract = await TokenContract.deploy();
-
   await tokenContract.deployed();
+  console.log("FRC token contract deployed at:\n",tokenContract.address);
+  /**------------------------------------------------------------------**
+   * Deploy LiquidityPool Contract
+   */
+  const LiquidityPoolContract = await ethers.getContractFactory("LiquidityPool");
+  const lpPoolContract = await LiquidityPoolContract.deploy(tokenContract.address);
+  await lpPoolContract.deployed();
+  console.log("LiquidityPool Contract deployed at:\n",lpPoolContract.address);
+  /**------------------------------------------------------------------**
+   * Deploy Nft Staking Pool Contract
+   */
+  const StakingPoolNFTContract = await ethers.getContractFactory("NftStakingPool");
+  const nftPoolContract = await StakingPoolNFTContract.deploy(nftContract.address);
+  await nftPoolContract.deployed();
+  console.log("Nft Staking Pool Contract deployed at:\n",nftPoolContract.address);
 
-  // Deploy FlappyOwlVault contract
-  const Vault = await ethers.getContractFactory("FlappyOwlVault");
-  const stakingVault = await Vault.deploy(
-    nftContract.address,
-    tokenContract.address
-  );
-
-  await stakingVault.deployed();
-
+  /**------------------------------------------------------------------**
+   * Deploy FlappyOwl Governor contract
+   */
+  // const param = [tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000];
+  const GovernorContract = await ethers.getContractFactory("FlappyOwlGovernor");
+  const governorContract = await GovernorContract.deploy(tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000);
+  await governorContract.deployed();
+  console.log("FlappyOwl Governor contract deployed at:\n", governorContract.address);
+  /**------------------------------------------------------------------**
+   * Set controller contract
+   */
   const control_tx = await tokenContract.setController(
-    stakingVault.address,
-    true
+    governorContract.address
   );
   await control_tx.wait();
-
-  console.log(
-    "NFT Descriptor contract deployed at:\n",
-    descriptorContract.address
-  );
-  console.log("StakeableNFT NFT contract deployed at:\n", nftContract.address);
-  console.log(
-    "StakeRewardCoin ERC20 token contract deployed at:\n",
-    tokenContract.address
-  );
-  console.log("NFT Staking Vault deployed at:\n", stakingVault.address);
+  console.log("Set Controller :\n", governorContract.address);
   console.log("Network deployed to :\n", deployNetwork);
 
   /* transfer contracts addresses & ABIs to the front-end */
@@ -67,10 +80,12 @@ async function main() {
     fs.writeFileSync(
       "../dapp/src/utils/contracts-config.js",
       `
-      export const vaultContractAddress = "${stakingVault.address}"
+      export const governorContractAddress = "${governorContract.address}"
+      export const liquidityPoolContractAddress = "${lpPoolContract.address}"
+      export const stakingPoolNFTContractAddress = "${nftPoolContract.address}"
       export const nftContractAddress = "${nftContract.address}"
       export const tokenContractAddress = "${tokenContract.address}"
-      export const ownerAddress = "${stakingVault.signer.address}"
+      export const ownerAddress = "${governorContract.signer.address}"
       export const networkDeployedTo = "${hre.network.config.chainId}"
     `
     );
@@ -78,15 +93,15 @@ async function main() {
 
   if (!developmentChains.includes(deployNetwork)) {
     console.log("waiting for 6 blocks verification ...");
-    await stakingVault.deployTransaction.wait(6);
+    await governorContract.deployTransaction.wait(6);
 
     // args represent contract constructor arguments
-    const args = [nftContract.address, tokenContract.address];
+    const args = [tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000];
     await verify(
-      stakingVault.address,
+      governorContract.address,
       args,
-      "FlappyOwlVault",
-      "FlappyOwlVault"
+      "FlappyOwlGovernor",
+      "FlappyOwlGovernor"
     );
   }
 }

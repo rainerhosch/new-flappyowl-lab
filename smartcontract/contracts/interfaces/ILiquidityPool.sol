@@ -3,7 +3,7 @@
  * ** author  : flappyowl foundation
  * ** package : @contracts/interface/ILiquidityPool.sol
  */
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.17;
 
 interface ILiquidityPool {
     function getPoolInfo(uint256 tokenId) external view returns (
