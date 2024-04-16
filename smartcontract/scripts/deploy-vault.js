@@ -70,12 +70,12 @@ async function main() {
     governorContract.address
   );
   await control_tx.wait();
-  console.log("Set Controller :\n", governorContract.address);
-  const setMinterTx = await tokenContract.set(
+  console.log("Set FRC Controller :\n", governorContract.address);
+  const setMinterTx = await tokenContract.setMinter(
     governorContract.address
   );
-  await control_tx.wait();
-  console.log("Set Controller :\n", governorContract.address);
+  await setMinterTx.wait();
+  console.log("Set FRC Minter to :\n", governorContract.address);
   console.log("Network deployed to :\n", deployNetwork);
 
   /* transfer contracts addresses & ABIs to the front-end */
