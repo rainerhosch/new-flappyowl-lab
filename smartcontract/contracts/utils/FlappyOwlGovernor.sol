@@ -22,19 +22,6 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     IFRC FRC;
     ILiquidityPool liquidityPool;
     IStakingPoolNft nftStakingPool;
-
-    // struct StaketNFT {
-    //     address user;
-    //     uint256 lastClaimedTime;
-    // }
-    // struct StakingLP {
-    //     address user;
-    //     uint256 startTime;
-    //     uint256 lockedTime;
-    // }
-    // mapping(uint256 => StaketNFT) nftVault;
-    // mapping(uint256 => StakingLP) lpVault;
-
     /*--------------------------------------------------------------------
      * EVENTS HANDLER
      *--------------------------------------------------------------------*/
@@ -60,9 +47,6 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     uint256 public rewardPerBlock; //100K FRC initial block reward
     uint256 public lastHalvingBlock;
     mapping(address => uint256) public lastClaimBlock;
-    // uint256 public totalItemsStaked;
-    // mapping(address => uint256) public stakingLiquidity;
-    // mapping(address => uint256) public stakedNftBalance;
 
     // addresses
     address constant FOUNDATION = 0xeE66bda0BC2C9ab72127Ce90944b4048775f5Fd9; // 15% FOR FOUNDATION LONG-TERM ENDOWMENT.
@@ -163,15 +147,11 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
         uint len = INITIAL_SUPPLY_RECEIVER.length;
         require(!initialSupplyMinted, "Initial Supply Has Minted!");
         initialSupplyMinted = true;
-        //set this address for minter of genesis supply
-        _setMinter(address(this));
         for (uint256 i = 0; i < len; i++) {
             _receiver = INITIAL_SUPPLY_RECEIVER[i];
             _amount = (INITIAL_SUPPLY_ALLOCATION[i] * initialSupply) / 100;
             FRC.mint(_receiver, _amount);
         }
-        //revoke this address for mint FRC
-        FRC.removeMinter(address(this));
     }
 
     function updateTokenInterface(address _tokenAddress) public onlyOwner {
@@ -180,21 +160,9 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
 
     function updateLiquidityStakingInterface(address _lpStakingAddress) public onlyOwner {
         liquidityPool = ILiquidityPool(_lpStakingAddress);
-        require(FRC.CONTROLLER_ADDRESS() == address(this), "Unauthorize!");
-        require(!FRC.isMinter(_lpStakingAddress), "Address is a minter!");
-        _setMinter(_lpStakingAddress);
     }
 
     function updateNftStakingInterface(address _nftStakingAddress) public onlyOwner {
         nftStakingPool = IStakingPoolNft(_nftStakingAddress);
-        require(FRC.CONTROLLER_ADDRESS() == address(this), "Unauthorize!");
-        require(!FRC.isMinter(_nftStakingAddress), "Address is a minter!");
-        _setMinter(_nftStakingAddress);
-    }
-
-    function _setMinter(address _address) private {
-        address[] memory new_minter;
-        new_minter[0] = _address;
-        FRC.setMinter(new_minter);
     }
 }

@@ -20,14 +20,10 @@ interface IFRC is IERC20 {
 
     event Mint(
         address indexed _account,
-        uint256 _amount,
-        uint256 _circulating_supply
+        uint256 indexed _amount,
+        uint256 indexed _circulating_supply
     );
 
     function mint(address to, uint256 amount) external returns (bool);
-    function removeMinter(address _address) external returns (bool);
-    function setMinter(address[] memory _address) external returns (bool);
-    function isMinter(address _address) external view returns (bool);
-    function CONTROLLER_ADDRESS() external view returns (address);
-    function MINTER_ADDRESS() external view returns (address[] memory);
+    // function MINTER_ADDRESS() external view returns (address);
 }
