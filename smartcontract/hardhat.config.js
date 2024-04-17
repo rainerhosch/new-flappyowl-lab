@@ -1,7 +1,7 @@
 require("dotenv").config();
-require("@nomiclabs/hardhat-etherscan");
+// require("@nomiclabs/hardhat-etherscan");
 require("@nomicfoundation/hardhat-ethers");
-// require("@nomicfoundation/hardhat-verify");
+require("@nomicfoundation/hardhat-verify");
 require("@nomicfoundation/hardhat-chai-matchers");
 require("hardhat-gas-reporter");
 
@@ -9,23 +9,16 @@ require("hardhat-gas-reporter");
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
-
   for (const account of accounts) {
     console.log(account.address);
   }
 });
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 const INFURA_API_KEY = process.env.INFURA_API_KEY;
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
+const CMC_API_KEY = process.env.CMC_API_KEY;
 const ACCOUNT = process.env.PRIVATE_KEY;
 
 module.exports = {
@@ -95,11 +88,13 @@ module.exports = {
     artifacts: "./artifacts",
   },
   gasReporter: {
+    // L1: "polygon",
     enabled: true,
     outputFile: "gas-reports.txt",
     noColors: true,
     currency: "USD",
     coin: "ETH",
+    coinmarketcap: `${CMC_API_KEY}`,
   },
   etherscan: {
     // apiKey: ETHERSCAN_API_KEY,
