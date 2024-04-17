@@ -3,6 +3,7 @@
   "137": "Polygon Mainnet",
   "56": "Binance Smart Chain",
   "5": "goerli",
+  "11155111": "sepolia",
   "4": "rinkeby",
   "80001": "Polygon Testnet",
   "42": "kovan",

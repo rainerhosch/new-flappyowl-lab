@@ -30,8 +30,9 @@ interface IStakingPoolNft {
     error NotHavePoolPosition();
     error NotHaveStakedNfts();
     error ForbidenAccess();
-    // function balanceOf(address user) external view returns (uint256 nftStakedbalance);
-    function tokensOfOwner(address user) external view returns (uint256[] memory tokens);
+    // function balanceOf(address _user) external view returns (uint256 nftStakedbalance);
+    function tokensOfOwner(address _user) external view returns (uint256[] memory tokens);
     function totalNftStakingOfPool() external view returns (uint256);
-    function totalStakedNft(address user) external view returns (uint256);
+    function poolStakingInfo(address _user) external view returns (uint256 votingPower);
+    function resetStakingTime(address _user) external returns (bool);
 }

@@ -23,10 +23,23 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     ILiquidityPool liquidityPool;
     IStakingPoolNft nftStakingPool;
 
+    // struct StaketNFT {
+    //     address user;
+    //     uint256 lastClaimedTime;
+    // }
+    // struct StakingLP {
+    //     address user;
+    //     uint256 startTime;
+    //     uint256 lockedTime;
+    // }
+    // mapping(uint256 => StaketNFT) nftVault;
+    // mapping(uint256 => StakingLP) lpVault;
+
     /*--------------------------------------------------------------------
      * EVENTS HANDLER
      *--------------------------------------------------------------------*/
     event Claimed(address indexed owner, uint256 indexed reward, uint256 indexed blockclaimed);
+    event HalvingReward(uint256 indexed _newBlockReward, uint256 _newHalvingBlock);
 
     /*--------------------------------------------------------------------*
      * ERRORS HANDLER
@@ -80,9 +93,9 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
         address _nftStakingAddress,
         uint256 _initialRewardPerBlock
     ) {
-        FRC = IFRC(_tokenAddress);
-        liquidityPool = ILiquidityPool(_lpStakingAddress);
-        nftStakingPool = IStakingPoolNft(_nftStakingAddress);
+        updateTokenInterface(_tokenAddress);
+        updateLiquidityStakingInterface(_lpStakingAddress);
+        updateNftStakingInterface(_nftStakingAddress);
         rewardPerBlock = _initialRewardPerBlock;
         lastHalvingBlock = block.number;
     }
@@ -91,53 +104,97 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
      * LOGIC
      *--------------------------------------------------------------------*/
     function updateReward() internal {
-        (rewardPerBlock, lastHalvingBlock) = RewardLibrary.updateReward(rewardPerBlock, lastHalvingBlock);
+        (uint256 _newBlockReward, uint256 _newHalvingBlock) = RewardLibrary.updateReward(rewardPerBlock, lastHalvingBlock);
+        if(_newBlockReward > rewardPerBlock){
+            rewardPerBlock = _newBlockReward;
+            lastHalvingBlock = _newHalvingBlock;
+            emit HalvingReward(_newBlockReward, _newHalvingBlock);
+        }
     }
     function _unclaimedRewards(address _user) internal returns (uint256) {
         updateReward();
         uint256 liqudityStakedOfUser = liquidityPool.getLiquidityLpOf(_user);
-        uint256 nftStakedOfUser = nftStakingPool.totalStakedNft(_user);
+        uint256 nftStakingPower = nftStakingPool.poolStakingInfo(_user);
         uint256 totalAllLiquidityOfPool = liquidityPool.totalLiquidityOfPool();
         uint256 totalNftStakedOfPool = nftStakingPool.totalNftStakingOfPool();
 
-        return RewardLibrary.calculateReward(rewardPerBlock, lastClaimBlock[_user], liqudityStakedOfUser, nftStakedOfUser, totalAllLiquidityOfPool, totalNftStakedOfPool);
+        
+        // uint256 tokenId = liquidityPool.poolOfAddress(_user);
+        // if(tokenId != 0){
+        //     (address owner, uint256 liquidity, address token0, address token1, uint256 lockedStart, uint256 lockedEnd) = liquidityPool.getPoolInfo(tokenId);
+        //     liqudityStakedOfUser = liquidity;
+        //     uint256 stakingPeriod = block.timestamp - lockedStart;
+        //     uint256 lockedYear = (lockedEnd / 365 days);
+        //     if (lockedYear <= 1) {
+        //         liqudityStakedOfUser = liqudityStakedOfUser * 150;
+        //     } else if (lockedYear <= 2 ) {
+        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
+        //     } else if (lockedYear <= 3) {
+        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
+        //     } else if (lockedYear <= 4) {
+        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
+        //     } else if (lockedYear >= 5) {
+        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
+        //     }
+        // }
+
+        return RewardLibrary.calculateReward(rewardPerBlock, lastClaimBlock[_user], liqudityStakedOfUser, nftStakingPower, totalAllLiquidityOfPool, totalNftStakedOfPool);
     }
     function _claim(address _user) internal returns (bool){
         uint256 rewardEarned = _unclaimedRewards(_user);
         require(rewardEarned > 0, "No rewards, for claim!");
         uint256 _blockClaimed = block.number;
-        // uint256 _blockTime = block.timestamp;
+        nftStakingPool.resetStakingTime(_user);
         lastClaimBlock[_user] = _blockClaimed;
         FRC.mint(_user, rewardEarned);
         emit Claimed(_user, rewardEarned, _blockClaimed);
         return true;
     }
-    function getUnclaimedRewards(address _user) public returns (uint256) {
+    function getUnclaimedRewards(address _user) external returns (uint256) {
+        require(msg.sender == address(liquidityPool) || msg.sender == address(nftStakingPool), "Unauthorize!");
         return _unclaimedRewards(_user);
     }
-    function claimReward(address _user) external returns (bool){
+    function claimReward(address _user) public returns (bool){
         return _claim(_user);
     }
-    function _genesisSupplyFRC() external onlyOwner {
+    function _genesisSupplyFRC() public onlyOwner {
         uint256 _amount;
         address _receiver;
         uint len = INITIAL_SUPPLY_RECEIVER.length;
         require(!initialSupplyMinted, "Initial Supply Has Minted!");
         initialSupplyMinted = true;
+        //set this address for minter of genesis supply
+        _setMinter(address(this));
         for (uint256 i = 0; i < len; i++) {
             _receiver = INITIAL_SUPPLY_RECEIVER[i];
             _amount = (INITIAL_SUPPLY_ALLOCATION[i] * initialSupply) / 100;
             FRC.mint(_receiver, _amount);
         }
+        //revoke this address for mint FRC
+        FRC.removeMinter(address(this));
     }
 
-    function updateVaultInterface(
-        address _tokenAddress,
-        address _lpStakingAddress,
-        address _nftStakingAddress
-    ) external onlyOwner {
+    function updateTokenInterface(address _tokenAddress) public onlyOwner {
         FRC = IFRC(_tokenAddress);
+    }
+
+    function updateLiquidityStakingInterface(address _lpStakingAddress) public onlyOwner {
         liquidityPool = ILiquidityPool(_lpStakingAddress);
+        require(FRC.CONTROLLER_ADDRESS() == address(this), "Unauthorize!");
+        require(!FRC.isMinter(_lpStakingAddress), "Address is a minter!");
+        _setMinter(_lpStakingAddress);
+    }
+
+    function updateNftStakingInterface(address _nftStakingAddress) public onlyOwner {
         nftStakingPool = IStakingPoolNft(_nftStakingAddress);
+        require(FRC.CONTROLLER_ADDRESS() == address(this), "Unauthorize!");
+        require(!FRC.isMinter(_nftStakingAddress), "Address is a minter!");
+        _setMinter(_nftStakingAddress);
+    }
+
+    function _setMinter(address _address) private {
+        address[] memory new_minter;
+        new_minter[0] = _address;
+        FRC.setMinter(new_minter);
     }
 }

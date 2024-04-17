@@ -36,12 +36,12 @@ function supportNetwork() {
       rpcUrls: ["https://goerli.infura.io/v3/"],
       blockExplorerUrls: ["https://goerli.etherscan.io/"],
     },
-    MUMBAI_TESTNET: {
+    SEPOLIA_TESTNET: {
       chainId: ethers.utils.hexlify(80001),
-      chainName: "Matic(Polygon) Mumbai Testnet",
-      nativeCurrency: { name: "tMATIC", symbol: "tMATIC", decimals: 18 },
-      rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
-      blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+      chainName: "Sepolia",
+      nativeCurrency: { name: "Ethereum", symbol: "SETH", decimals: 18 },
+      rpcUrls: ["https://sepolia.infura.io/v3/"],
+      blockExplorerUrls: ["https://sepolia.etherscan.io/"],
     },
     BSC_TESTNET: {
       chainId: ethers.utils.hexlify(97),

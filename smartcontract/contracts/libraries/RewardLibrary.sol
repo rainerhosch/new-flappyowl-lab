@@ -4,6 +4,10 @@ pragma solidity ^0.8.17;
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 library RewardLibrary {
     using SafeMath for uint256;
+
+    uint256 internal constant WEEK = 7 days;
+    uint256 internal constant MONTH = 30 days;
+    uint256 internal constant YEAR = 365 days;
     uint256 internal constant halvingInterval = 10000; // halving set every 10K block
 
     function updateReward(
@@ -26,7 +30,7 @@ library RewardLibrary {
         uint256 _rewardPerBlock,
         uint256 _lastClaimBlock,
         uint256 _liqudityStakedOfUser,
-        uint256 _nftStakedOfUser,
+        uint256 _nftStakingPower,
         uint256 _totalAllLiquidityOfPool,
         uint256 _totalNftStakedOfPool
     ) internal view returns (uint256) {
@@ -35,10 +39,9 @@ library RewardLibrary {
         uint256 nftStakingBaseReward = ((_rewardPerBlock * 30) / 100);
 
         uint256 liquidityReward = (liquidityBaseReward * _liqudityStakedOfUser) / _totalAllLiquidityOfPool;
-        uint256 nftStakingReward = (nftStakingBaseReward * _nftStakedOfUser) / _totalNftStakedOfPool;
+        uint256 nftStakingReward = (nftStakingBaseReward * _nftStakingPower) / _totalNftStakedOfPool;
 
         uint256 totalReward = blocksSinceLastClaim * (liquidityReward + nftStakingReward);
         return totalReward;
-
     }
 }

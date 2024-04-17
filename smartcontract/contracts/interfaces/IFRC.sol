@@ -6,21 +6,28 @@ pragma solidity ^0.8.0;
  */
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 interface IFRC is IERC20 {
-        /*-------------------------------------------------------------------- *
+    /*-------------------------------------------------------------------- *
      * Error
      * -------------------------------------------------------------------- *
      */
     error NotController();
     error NotMinter();
     error NotOwner();
-    
+
     error ZeroAmount();
     error ZeroAddress();
     error InitialSupplyMinted();
 
-    event Mint(address indexed _account, uint256 _amount, uint256 _circulating_supply);
+    event Mint(
+        address indexed _account,
+        uint256 _amount,
+        uint256 _circulating_supply
+    );
 
     function mint(address to, uint256 amount) external returns (bool);
-    function controller() external view returns (address);
-    function minter() external view returns (address);
+    function removeMinter(address _address) external returns (bool);
+    function setMinter(address[] memory _address) external returns (bool);
+    function isMinter(address _address) external view returns (bool);
+    function CONTROLLER_ADDRESS() external view returns (address);
+    function MINTER_ADDRESS() external view returns (address[] memory);
 }

@@ -10,23 +10,29 @@ import {IFlappyOwlNftTestnet} from "../interfaces/IFlappyOwlNftTestnet.sol";
 import {IStakingPoolNft} from "../interfaces/IStakingPoolNft.sol";
 
 contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
+    uint256 internal constant WEEK = 7 days;
+    uint256 internal constant MONTH = 30 days;
+    uint256 internal constant YEAR = 365 days;
+
     using SafeMath for uint256;
     IFlappyOwlNftTestnet nft;
 
     struct StakedNft {
         address owner;
-        uint256 stakingStartTime;
+        uint256 stakingTime;
     }
 
     // address public controller;
     uint256 public totalNftStakingPool;
 
-    // mapping(address => bool) controllers;
+    address public CONTROLLER_ADDRESS;
+    address private owner;
     mapping(uint256 => StakedNft) pools;
     mapping(address => uint256) public stakedNftBalance;
     mapping(address => uint256) public lastClaimBlock;
 
     constructor(address _nftAddress) {
+        owner = msg.sender;
         nft = IFlappyOwlNftTestnet(_nftAddress);
     }
 
@@ -82,22 +88,61 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
     //--------------------------------------------------------------------
     // VIEW FUNCTIONS
     
-    function totalNftStakingOfPool() external view returns (uint256){
+    function totalNftStakingOfPool() public view returns (uint256){
         return totalNftStakingPool;
     }
-    function totalStakedNft(address user) external view returns (uint256 poolBalance){
-        return poolBalance = stakedNftBalance[user];
+    function poolStakingInfo(address _user) public view returns (uint256 votingPower){
+        uint256 balance = stakedNftBalance[_user];
+        uint256 calculateVotingPower;
+        require(balance > 0, "Not have staked nfts!");
+        uint256[] memory tokens = tokensOfOwner(_user);
+        for (uint256 i; i < tokens.length; ) {
+            uint256 stakingPeriod = block.timestamp - pools[tokens[i]].stakingTime;
+            uint256 _votePower = _calculateVotePower(stakingPeriod);
+            calculateVotingPower += (100 * _votePower * stakingPeriod * 1e18) / 1 days;
+            unchecked {
+                ++i;
+            }
+        }
+        return votingPower = calculateVotingPower;
     }
 
+    function resetStakingTime(address _user) public returns (bool){
+        require(msg.sender == CONTROLLER_ADDRESS, "Unauthorize address!");
+        uint256[] memory tokens = tokensOfOwner(_user);
+        for (uint256 i; i < tokens.length; ) {
+            pools[tokens[i]].stakingTime = block.timestamp;
+            unchecked {
+                ++i;
+            }
+        }
+        return true;
+    }
+
+    function _calculateVotePower(
+        uint256 stakingPeriod
+    ) internal view returns (uint256 votePower) {
+        if (stakingPeriod <= WEEK) {
+            votePower = 100 / totalNftStakingPool;
+        } else if (stakingPeriod < MONTH) {
+            votePower = 200 / totalNftStakingPool;
+        }else if (stakingPeriod < 6 * MONTH) {
+            votePower = 400 / totalNftStakingPool;
+        } else if (stakingPeriod >= 6 * MONTH) {
+            votePower = 800 / totalNftStakingPool;
+        } else if (stakingPeriod >= YEAR) {
+            votePower = 1600 / totalNftStakingPool;
+        }
+    }
+    
     function tokensOfOwner(
         address user
     ) public view returns (uint256[] memory tokens) {
         uint256 balance = stakedNftBalance[user];
+        require(balance > 0, "Not have staked nfts!");
         uint256 supply = nft.totalSupply();
         tokens = new uint256[](balance);
-
         uint256 counter;
-
         if (balance == 0) {
             return tokens;
         }
@@ -113,6 +158,10 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
                 }
             }
         }
+    }
+    function setController(address _address) public {
+        require(msg.sender == owner,"Unauthorize address!");
+        CONTROLLER_ADDRESS = _address;
     }
     
     function onERC721Received(

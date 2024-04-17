@@ -58,9 +58,10 @@ async function main() {
   /**------------------------------------------------------------------**
    * Deploy FlappyOwl Governor contract
    */
+  const initialRewardPerBlock = getAmountInWei(100000);
   // const param = [tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000];
   const GovernorContract = await ethers.getContractFactory("FlappyOwlGovernor");
-  const governorContract = await GovernorContract.deploy(tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000);
+  const governorContract = await GovernorContract.deploy(tokenContract.address, lpPoolContract.address, nftPoolContract.address, initialRewardPerBlock);
   await governorContract.deployed();
   console.log("FlappyOwl Governor contract deployed at:\n", governorContract.address);
   /**------------------------------------------------------------------**
