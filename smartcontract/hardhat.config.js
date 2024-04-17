@@ -1,7 +1,8 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-etherscan");
+require("@nomicfoundation/hardhat-ethers");
+// require("@nomicfoundation/hardhat-verify");
 require("@nomicfoundation/hardhat-chai-matchers");
-require("@nomicfoundation/hardhat-verify");
 require("hardhat-gas-reporter");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -22,12 +23,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+const INFURA_API_KEY = process.env.INFURA_API_KEY;
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
-const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
-const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
-const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL;
-const MUMBAI_RPC_URL = process.env.MUMBAI_RPC_URL;
-const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL;
 const ACCOUNT = process.env.PRIVATE_KEY;
 
 module.exports = {
@@ -65,13 +63,13 @@ module.exports = {
       accounts: [ACCOUNT],
     },
     goerli: {
-      url: GOERLI_RPC_URL,
+      url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [ACCOUNT],
       chainId: 5,
       blockConfirmations: 6,
     },
     sepolia: {
-      url: SEPOLIA_RPC_URL,
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [ACCOUNT],
       chainId: 11155111,
       blockConfirmations: 6,
@@ -104,12 +102,27 @@ module.exports = {
     coin: "ETH",
   },
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
-    // apiKey: {
-    //   default: ETHERSCAN_API_KEY,
-    //   goerli: ETHERSCAN_API_KEY,
-    //   rinkeby: RINKEBY_ETHERSCAN_API_KEY,
-    //   bsc: BSCSCAN_API_KEY,
-    // },
+    // apiKey: ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: ETHERSCAN_API_KEY,
+      goerli: ETHERSCAN_API_KEY,
+      sepolia: ETHERSCAN_API_KEY,
+      bsc: BSCSCAN_API_KEY,
+    },
+    customChains: [
+      {
+        network: "sepolia",
+        chainId: 11155111,
+        urls: {
+          apiURL: "https://api-sepolia.etherscan.io/api",
+          browserURL: "https://sepolia.etherscan.io/"
+        }
+      }
+    ]
   },
+  sourcify: {
+    // Disabled by default
+    // Doesn't need an API key
+    enabled: true
+  }
 };

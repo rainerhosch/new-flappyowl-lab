@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 const fs = require("fs");
 const fse = require("fs-extra");
-const { verify } = require("../utils/verify");
+// const { verify } = require("../utils/verify");
 const {
   getAmountInWei,
   developmentChains,
@@ -96,19 +96,19 @@ async function main() {
     );
   }
 
-  if (!developmentChains.includes(deployNetwork)) {
-    console.log("waiting for 6 blocks verification ...");
-    await governorContract.deployTransaction.wait(6);
+  // if (!developmentChains.includes(deployNetwork)) {
+  //   console.log("waiting for 6 blocks verification ...");
+  //   await governorContract.deployTransaction.wait(6);
 
-    // args represent contract constructor arguments
-    const args = [tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000];
-    await verify(
-      governorContract.address,
-      args,
-      "FlappyOwlGovernor",
-      "FlappyOwlGovernor"
-    );
-  }
+  //   // args represent contract constructor arguments
+  //   const args = [tokenContract.address, lpPoolContract.address, nftPoolContract.address, 100000];
+  //   await verify(
+  //     governorContract.address,
+  //     args,
+  //     "FlappyOwlGovernor",
+  //     "FlappyOwlGovernor"
+  //   );
+  // }
 }
 
 main()
