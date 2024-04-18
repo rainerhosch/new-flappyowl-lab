@@ -15,7 +15,7 @@ interface ILiquidityPool {
         uint256 lockedEnd
     );
 
-    function poolOfAddress(address owner) external view returns (uint256);
+    function poolOfAddress(address owner) external view returns (uint256[] memory);
     function totalLiquidityOfPool() external view returns (uint256);
     function totalPool() external view returns (uint256);
     function getLiquidityLpOf(address user) external view returns (uint128);

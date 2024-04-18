@@ -9,7 +9,7 @@
     "verify": "npx hardhat verify --network sepolia --contract",
     "clean": "npx hardhat clean",
     "test": "npx hardhat test",
-    "hh-help": "npx hardhat -H"
+    "setup": "npx hardhat run scripts/setup-controller.js"
   },
   "dependencies": {
     "@chainlink/contracts": "^1.0.0",

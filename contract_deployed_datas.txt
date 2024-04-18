@@ -17,3 +17,32 @@ Network deployed to :
 waiting for 6 blocks verification ...
 Verifying contract...
 Nothing to compile
+
+
++++++ NEW +++++++++++++++++++++++++++++++++++++
+
+$ yarn deploy --network sepolia
+yarn run v1.22.19
+$ npx hardhat run scripts/deploy-vault.js --network sepolia
+Compiled 54 Solidity files successfully (evm target: london).
+NFT Descriptor contract deployed at:
+ 0x500738fBe7E9fcD8268cD96F567f7a8C837Dd41b
+FlappyOwl NFT contract deployed at:
+ 0xc262f315453BBBB2e3803e631f8ba5F049769210
+FRC token contract deployed at:
+ 0xF78D7305F8be9E724F73Bae925cDEE821454818F
+LiquidityPool Contract deployed at:
+ 0x8A5fEFf3712a9F21dAa3858C9Fec3356649eFD15
+Nft Staking Pool Contract deployed at:
+ 0x6622fF9F092F9c9cfD975aF152F98a6a09319437
+FlappyOwl Governor contract deployed at:
+ 0x78D3eCc18603C270Eb750B5e3fDd10440b40927E
+Set FRC Minter :
+ 0x78D3eCc18603C270Eb750B5e3fDd10440b40927E
+Set Controller of Liquidity Pool :
+ 0x78D3eCc18603C270Eb750B5e3fDd10440b40927E
+Set Controller of Staking NFT Pool :
+ 0x78D3eCc18603C270Eb750B5e3fDd10440b40927E
+Network deployed to :
+ sepolia
+Done in 212.21s.

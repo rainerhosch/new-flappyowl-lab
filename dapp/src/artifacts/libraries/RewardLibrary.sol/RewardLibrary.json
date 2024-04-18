@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "RewardLibrary",
+  "sourceName": "contracts/libraries/RewardLibrary.sol",
+  "abi": [],
+  "bytecode": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea26469706673582212208c1d32faf61df306b1beae9ecd0561200a8e73b77290eebf917c27a821d8424364736f6c63430008110033",
+  "deployedBytecode": "0x600080fdfea26469706673582212208c1d32faf61df306b1beae9ecd0561200a8e73b77290eebf917c27a821d8424364736f6c63430008110033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

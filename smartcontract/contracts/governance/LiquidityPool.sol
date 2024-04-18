@@ -10,7 +10,7 @@ pragma abicoder v2;
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {TickMath} from "../libraries/TickMath.sol";
 import {TransferHelper} from "../libraries/TransferHelper.sol";
-import {INonfungiblePositionManager} from "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import {INonfungiblePositionManager} from "../interfaces/INonfungiblePositionManager.sol";
 import {IFRC} from "../interfaces/IFRC.sol";
 import {ILiquidityPool} from "../interfaces/ILiquidityPool.sol";
 import {IWETH} from "../interfaces/IWETH.sol";
@@ -44,6 +44,8 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
 
     /// pools[tokenId] => Pool
     mapping(uint256 => Pool) public pools;
+    // Mapping from pool owner to their list of token IDs
+    mapping(address => uint256[]) private ownerPools;
 
     event PoolCreated(uint256 indexed tokenId, address indexed owner);
     event PoolRemoved(uint256 indexed tokenId, address indexed owner);
@@ -100,6 +102,8 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
 
         totalPools++; // Increment totalPools when a new pool is created
         totalLiquidityStaked += liquidity; // Increment total liquidity has staked at Pools
+
+        ownerPools[owner].push(tokenId);
         emit PoolCreated(tokenId, owner);
     }
     /// @notice Collects the fees associated with provided liquidity
@@ -372,12 +376,12 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
 
     function poolLockInfo(address _user) public view returns (uint256 lockPower){
         uint256 calculateVotingPower = 0;
-        uint256[] memory tokens = poolOfAddress(_user);
+        uint256[] memory tokens = ownerPools[_user];
         require(tokens.length > 0, "Not have pool position!");
         for(uint256 i; i < tokens.length;){
             uint256 unlockTime = pools[tokens[i]].lockedEnd - block.timestamp;
             uint256 timePower = block.timestamp - pools[tokens[i]].timePower;
-            uint256 _votePower = _calculateVotePower(timePower);
+            uint256 _votePower = _calculateTimePower(timePower);
             calculateVotingPower += (_votePower * unlockTime) / 1 days;
             unchecked {
                 ++i;
@@ -387,7 +391,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     }
     function resetTimePower(address _user) external returns (bool){
         require(msg.sender == CONTROLLER_ADDRESS, "Unauthorize address!");
-        uint256[] memory tokens = poolOfAddress(_user);
+        uint256[] memory tokens = ownerPools[_user];
         for (uint256 i; i < tokens.length; ) {
             pools[tokens[i]].timePower = block.timestamp;
             unchecked {
@@ -422,17 +426,8 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     // get 
     function poolOfAddress(
         address _owner
-    ) external view returns (uint256 tokenId) {
-        // uint256 tokenId;
-        uint256 index = 0;
-        for (uint256 i = 0; i < totalPools; i++) {
-            if (pools[i].owner == _owner) {
-                tokenId = i;
-                index++;
-            }
-        }
-
-        return tokenId;
+    ) public view returns (uint256[] memory) {
+        return ownerPools[_owner];
     }
 
     function totalLiquidityOfPool() public view returns (uint256){

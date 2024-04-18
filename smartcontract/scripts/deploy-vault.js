@@ -79,7 +79,7 @@ async function main() {
   await control_lp_pool.wait();
   console.log("Set Controller of Liquidity Pool :\n", governorContract.address);
 
-  const control_nft_pool = await tokenContract.setMinter(
+  const control_nft_pool = await nftPoolContract.setController(
     governorContract.address
   );
   await control_nft_pool.wait();
