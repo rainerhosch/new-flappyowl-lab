@@ -97,38 +97,19 @@ contract FlappyOwlGovernor is Ownable, ReentrancyGuard {
     }
     function _unclaimedRewards(address _user) internal returns (uint256) {
         updateReward();
-        uint256 liqudityStakedOfUser = liquidityPool.getLiquidityLpOf(_user);
+        uint256 liquidityLockPower = liquidityPool.poolLockInfo(_user);
         uint256 nftStakingPower = nftStakingPool.poolStakingInfo(_user);
         uint256 totalAllLiquidityOfPool = liquidityPool.totalLiquidityOfPool();
         uint256 totalNftStakedOfPool = nftStakingPool.totalNftStakingOfPool();
 
-        
-        // uint256 tokenId = liquidityPool.poolOfAddress(_user);
-        // if(tokenId != 0){
-        //     (address owner, uint256 liquidity, address token0, address token1, uint256 lockedStart, uint256 lockedEnd) = liquidityPool.getPoolInfo(tokenId);
-        //     liqudityStakedOfUser = liquidity;
-        //     uint256 stakingPeriod = block.timestamp - lockedStart;
-        //     uint256 lockedYear = (lockedEnd / 365 days);
-        //     if (lockedYear <= 1) {
-        //         liqudityStakedOfUser = liqudityStakedOfUser * 150;
-        //     } else if (lockedYear <= 2 ) {
-        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
-        //     } else if (lockedYear <= 3) {
-        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
-        //     } else if (lockedYear <= 4) {
-        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
-        //     } else if (lockedYear >= 5) {
-        //         liqudityStakedOfUser = liqudityStakedOfUser * 5;
-        //     }
-        // }
-
-        return RewardLibrary.calculateReward(rewardPerBlock, lastClaimBlock[_user], liqudityStakedOfUser, nftStakingPower, totalAllLiquidityOfPool, totalNftStakedOfPool);
+        return RewardLibrary.calculateReward(rewardPerBlock, lastClaimBlock[_user], liquidityLockPower, nftStakingPower, totalAllLiquidityOfPool, totalNftStakedOfPool);
     }
     function _claim(address _user) internal returns (bool){
         uint256 rewardEarned = _unclaimedRewards(_user);
         require(rewardEarned > 0, "No rewards, for claim!");
         uint256 _blockClaimed = block.number;
         nftStakingPool.resetStakingTime(_user);
+        liquidityPool.resetTimePower(_user);
         lastClaimBlock[_user] = _blockClaimed;
         FRC.mint(_user, rewardEarned);
         emit Claimed(_user, rewardEarned, _blockClaimed);

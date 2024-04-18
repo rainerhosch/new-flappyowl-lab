@@ -67,16 +67,23 @@ async function main() {
   /**------------------------------------------------------------------**
    * Set controller contract
    */
-  const control_tx = await tokenContract.setController(
+  const set_minter_frc = await tokenContract.setMinter(
     governorContract.address
   );
-  await control_tx.wait();
-  console.log("Set FRC Controller :\n", governorContract.address);
-  const setMinterTx = await tokenContract.setMinter(
+  await set_minter_frc.wait();
+  console.log("Set FRC Minter :\n", governorContract.address);
+
+  const control_lp_pool = await lpPoolContract.setController(
     governorContract.address
   );
-  await setMinterTx.wait();
-  console.log("Set FRC Minter to :\n", governorContract.address);
+  await control_lp_pool.wait();
+  console.log("Set Controller of Liquidity Pool :\n", governorContract.address);
+
+  const control_nft_pool = await tokenContract.setMinter(
+    governorContract.address
+  );
+  await control_nft_pool.wait();
+  console.log("Set Controller of Staking NFT Pool :\n", governorContract.address);
   console.log("Network deployed to :\n", deployNetwork);
 
   /* transfer contracts addresses & ABIs to the front-end */

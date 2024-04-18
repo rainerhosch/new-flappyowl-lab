@@ -18,12 +18,17 @@ import {IWETH} from "../interfaces/IWETH.sol";
 contract LiquidityPool is IERC721Receiver, ILiquidityPool {
     INonfungiblePositionManager public nonfungiblePositionManager = INonfungiblePositionManager(0x1238536071E1c677A632429e3655c799b22cDA52);
     IWETH private constant weth = IWETH(0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14);
-
+    
+    uint256 internal constant WEEK = 7 days;
+    uint256 internal constant MONTH = 30 days;
+    uint256 internal constant YEAR = 365 days;
 
     uint24 public constant poolFee = 3000; // base pool fees is 0.3%
     uint24 public constant taxFee = 10000; // tax from earning LP fees is 1% for inceas base LP
     uint256 public totalPools;
     uint256 public totalLiquidityStaked;
+    address public CONTROLLER_ADDRESS;
+    address private contract_owner;
 
     IFRC internal FRC;
 
@@ -33,7 +38,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
         uint128 liquidity;
         address token0;
         address token1;
-        uint256 lockedStart;
+        uint256 timePower;
         uint256 lockedEnd;
     }
 
@@ -45,6 +50,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
 
     constructor(address _token) {
         FRC = IFRC(_token);
+        contract_owner = msg.sender;
         totalPools = 0;
     }
 
@@ -88,7 +94,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             liquidity: liquidity,
             token0: token0,
             token1: token1,
-            lockedStart: block.timestamp,
+            timePower: block.timestamp,
             lockedEnd: lockedEnd
         });
 
@@ -116,10 +122,12 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             });
 
         (amount0, amount1) = nonfungiblePositionManager.collect(params);
-
-        uint256 taxForLP = (amount1 * taxFee) / 100;
-        _increaseLiquidityCurrentRange(0, 0, taxForLP);
-        _sendToOwner(tokenId, amount0, amount1 - taxForLP);
+        uint256 taxAmount0 = (amount0 * taxFee) / 100;
+        uint256 taxAmount1 = (amount1 * taxFee) / 100;
+        amount0 = amount0 - taxAmount0;
+        amount1 = amount1 - taxAmount1;
+        _increaseLiquidityCurrentRange(0, taxAmount0, taxAmount1);
+        _sendToOwner(tokenId, amount0, amount1);
     }
     
 
@@ -347,7 +355,7 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             uint128 liquidity,
             address token0,
             address token1,
-            uint256 lockedStart,
+            uint256 timePower,
             uint256 lockedEnd
         )
     {
@@ -357,9 +365,58 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
             pool.liquidity,
             pool.token0,
             pool.token1,
-            pool.lockedStart,
+            pool.timePower,
             pool.lockedEnd
         );
+    }
+
+    function poolLockInfo(address _user) public view returns (uint256 lockPower){
+        uint256 calculateVotingPower = 0;
+        uint256[] memory tokens = poolOfAddress(_user);
+        require(tokens.length > 0, "Not have pool position!");
+        for(uint256 i; i < tokens.length;){
+            uint256 unlockTime = pools[tokens[i]].lockedEnd - block.timestamp;
+            uint256 timePower = block.timestamp - pools[tokens[i]].timePower;
+            uint256 _votePower = _calculateVotePower(timePower);
+            calculateVotingPower += (_votePower * unlockTime) / 1 days;
+            unchecked {
+                ++i;
+            }
+        }
+        return lockPower = calculateVotingPower;
+    }
+    function resetTimePower(address _user) external returns (bool){
+        require(msg.sender == CONTROLLER_ADDRESS, "Unauthorize address!");
+        uint256[] memory tokens = poolOfAddress(_user);
+        for (uint256 i; i < tokens.length; ) {
+            pools[tokens[i]].timePower = block.timestamp;
+            unchecked {
+                ++i;
+            }
+        }
+        return true;
+    }
+
+    function _calculateTimePower(
+        uint256 timePower
+    ) internal view returns (uint256 votePower) {
+        if (timePower <= WEEK) {
+            votePower = (totalLiquidityStaked * 100) / totalPools;
+        } else if (timePower <= MONTH) {
+            votePower = (totalLiquidityStaked * 200) / totalPools;
+        }else if (timePower <= 6 * MONTH) {
+            votePower = (totalLiquidityStaked * 400) / totalPools;
+        } else if (timePower <= YEAR) {
+            votePower = (totalLiquidityStaked * 800) / totalPools;
+        } else if (timePower <= 2 * YEAR) {
+            votePower = (totalLiquidityStaked * 1600) / totalPools;
+        } else if (timePower <= 3 * YEAR) {
+            votePower = (totalLiquidityStaked * 3200) / totalPools;
+        } else if (timePower <= 4 * YEAR) {
+            votePower = (totalLiquidityStaked * 6400) / totalPools;
+        } else if (timePower > 4 * YEAR) {
+            votePower = (totalLiquidityStaked * 12800) / totalPools;
+        }
     }
 
     // get 
@@ -407,5 +464,9 @@ contract LiquidityPool is IERC721Receiver, ILiquidityPool {
         _collectAllFees(tokenId);
         delete pools[tokenId];
         nonfungiblePositionManager.safeTransferFrom(address(this),msg.sender,tokenId);
+    }
+    function setController(address _address) public {
+        require(msg.sender == contract_owner,"Unauthorize address!");
+        CONTROLLER_ADDRESS = _address;
     }
 }

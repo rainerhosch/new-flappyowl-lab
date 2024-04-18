@@ -26,13 +26,13 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
     uint256 public totalNftStakingPool;
 
     address public CONTROLLER_ADDRESS;
-    address private owner;
+    address private contract_owner;
     mapping(uint256 => StakedNft) pools;
     mapping(address => uint256) public stakedNftBalance;
     mapping(address => uint256) public lastClaimBlock;
 
     constructor(address _nftAddress) {
-        owner = msg.sender;
+        contract_owner = msg.sender;
         nft = IFlappyOwlNftTestnet(_nftAddress);
     }
 
@@ -93,7 +93,7 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
     }
     function poolStakingInfo(address _user) public view returns (uint256 votingPower){
         uint256 balance = stakedNftBalance[_user];
-        uint256 calculateVotingPower;
+        uint256 calculateVotingPower = 0;
         require(balance > 0, "Not have staked nfts!");
         uint256[] memory tokens = tokensOfOwner(_user);
         for (uint256 i; i < tokens.length; ) {
@@ -107,7 +107,7 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
         return votingPower = calculateVotingPower;
     }
 
-    function resetStakingTime(address _user) public returns (bool){
+    function resetStakingTime(address _user) external returns (bool){
         require(msg.sender == CONTROLLER_ADDRESS, "Unauthorize address!");
         uint256[] memory tokens = tokensOfOwner(_user);
         for (uint256 i; i < tokens.length; ) {
@@ -160,7 +160,7 @@ contract NftStakingPool is IERC721Receiver, IStakingPoolNft {
         }
     }
     function setController(address _address) public {
-        require(msg.sender == owner,"Unauthorize address!");
+        require(msg.sender == contract_owner,"Unauthorize address!");
         CONTROLLER_ADDRESS = _address;
     }
     

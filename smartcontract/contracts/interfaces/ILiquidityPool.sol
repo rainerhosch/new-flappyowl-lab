@@ -19,4 +19,6 @@ interface ILiquidityPool {
     function totalLiquidityOfPool() external view returns (uint256);
     function totalPool() external view returns (uint256);
     function getLiquidityLpOf(address user) external view returns (uint128);
+    function poolLockInfo(address _user) external view returns (uint256);
+    function resetTimePower(address _user) external returns (bool);
 }
