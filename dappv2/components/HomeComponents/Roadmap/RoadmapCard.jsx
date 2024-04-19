@@ -15,13 +15,13 @@ const RoadmapCard = ({ data }) => {
                 />
                 <div className=" text-Snow font-mono ">{data?.tittle}</div>
                 <div className="text-xs text-LightGray italic mt-1 font-mono">
-                    {data?.time}
+                    {/* {data?.time} */}
                 </div>
                 <div className="text-sm mt-2 text-LightGray font-mono">
                     {data.task?.map((task) => (
                         <li key={task.id}>
                             {task.task_name}
-                            {task.task_status === true ? (
+                            {task.task_status === 1 ? (
                                 <span className="inline-block h-5 w-5 text-[#00e1ff83]">
                                     <svg
                                         className="h-5 w-5"
@@ -35,8 +35,10 @@ const RoadmapCard = ({ data }) => {
                                         />
                                     </svg>
                                 </span>
-                            ) : (
+                            ) : task.task_status === 2 ? (
                                 <i className="text-[#b3ff2767]">&nbsp;&nbsp;On Progress</i>
+                            ) : (
+                                <i className="text-[#55555567]">&nbsp;&nbsp;Soon</i>
                             )}
                         </li>
                     ))}
