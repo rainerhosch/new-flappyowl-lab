@@ -1,15 +1,30 @@
-import { http } from 'wagmi'
-import { sepolia } from 'wagmi/chains'
+import { http } from "wagmi"
+import { sepolia } from "wagmi/chains"
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
-import { metaMaskWallet, ledgerWallet, zerionWallet, rainbowWallet, bitgetWallet, coinbaseWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets"
-
+import {
+    metaMaskWallet,
+    ledgerWallet,
+    zerionWallet,
+    rainbowWallet,
+    bitgetWallet,
+    coinbaseWallet,
+    walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets"
 export const config = getDefaultConfig({
-    appName: "RainbowKit demo",
+    appName: "Flappyowl Testnet",
     projectId: "YOUR_PROJECT_ID",
     wallets: [
         {
             groupName: "Recommended",
-            wallets: [metaMaskWallet, coinbaseWallet, zerionWallet, rainbowWallet, bitgetWallet, ledgerWallet, walletConnectWallet ],
+            wallets: [
+                // metaMaskWallet,
+                coinbaseWallet,
+                rainbowWallet,
+                // zerionWallet,
+                // bitgetWallet,
+                // ledgerWallet,
+                walletConnectWallet,
+            ],
         },
     ],
     chains: [sepolia],

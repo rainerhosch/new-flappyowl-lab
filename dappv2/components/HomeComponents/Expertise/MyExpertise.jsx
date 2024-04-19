@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { ethers } from "ethers"
-import nftContract from "../../../constants/artifacts/NFT/FlappyOwlNftTestnet.sol/FlappyOwlNftTestnet.json"
-import governorContract from "../../../constants/artifacts/utils/FlappyOwlGovernor.sol/FlappyOwlGovernor.json"
-import liquidityPoolContract from "../../../constants/artifacts/governance/LiquidityPool.sol/LiquidityPool.json"
-import stakingPoolNFTContract from "../../../constants/artifacts/governance/NftStakingPool.sol/NftStakingPool.json"
+import { useAccount, useChains, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+// import nftContract from "../../../constants/artifacts/NFT/FlappyOwlNftTestnet.sol/FlappyOwlNftTestnet.js"
+// import governorContract from "../../../constants/artifacts/utils/FlappyOwlGovernor.sol/FlappyOwlGovernor.json"
+// import liquidityPoolContract from "../../../constants/artifacts/governance/LiquidityPool.sol/LiquidityPool.json"
+// import stakingPoolNFTContract from "../../../constants/artifacts/governance/NftStakingPool.sol/NftStakingPool.json"
+import { flappyOwlNftTestnetAbi, frcAbi, nftStakingPoolAbi, liquidityPoolAbi, flappyOwlGovernorAbi } from '../../../src/smartcontract-abi'
 import {
     governorContractAddress,
     liquidityPoolContractAddress,
@@ -12,18 +14,41 @@ import {
     tokenContractAddress,
     ownerAddress,
     networkDeployedTo
-} from "../../../utils/contracts-config.js"
-import RecentMinted from "../Carousel/RecentMinted"
-import BaseFrog from "../../Common/Frog"
-import EChartsExample from "../Chart/Piechart"
+} from "../../../utils/contracts_config.js"
+import RecentMinted from "../Carousel/RecentMinted.jsx"
+import BaseFrog from "../../Common/Frog.jsx"
+import EChartsExample from "../Chart/Piechart.jsx"
+// const contractConfig = {
+//     address: nftContractAddress,
+//     flappyOwlNftTestnetAbi,
+//   } as const;
 const MyExpertise = () => {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    const [totalMinted, setTotalMinted] = useState("0");
+    // const { isConnected } = useAccount();
+
+
     const [isLoading, _setIsLoading] = useState(true)
     const [isWrongNetwork, _setWrongNetwork] = useState(true)
     const [isConnected, _setIsConnected] = useState(true)
     const [recentlyMintedNFTs, _setRecentlyMintedNFTs] = useState([])
     const [totalStakedNft, _setTotalStakedNft] = useState(0)
+    const [messagejson, setMessagejson] = useState("")
+    const [totalSuppyNft, setTotalSupplyNFT] = useState(0)
 
     // console.log("Chain ID changed!", chainId)
+    // const { data: pdata, config } = usePrepareContractWrite({
+    //     address: Contract.Address,
+    //     abi: Contract.ABI,
+    //     functionName: "stakeEnd",
+    //     args: [props.index, Number(props.id)],
+    //     onError: (e) => debug("ERROR PrepareContractWrite: ", e)
+    // })
+    // debug("PrepareContractWrite: ", pdata, config)
+
+
 
     useEffect(() => {
         async function getRecentlyMintedNFTs() {
@@ -47,12 +72,12 @@ const MyExpertise = () => {
 
                 const nft_contract = new ethers.Contract(
                     nftContractAddress,
-                    nftContract.abi,
+                    flappyOwlNftTestnetAbi,
                     provider
                 )
                 const staking_contract = new ethers.Contract(
                     stakingPoolNFTContractAddress,
-                    stakingPoolNFTContract.abi,
+                    nftStakingPoolAbi,
                     provider
                 )
 

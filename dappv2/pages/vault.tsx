@@ -11,20 +11,12 @@ import axios from "axios";
 import ImageAndParagraphSkeleton from "../components/Common/ImageAndParagraphSkeleton";
 import { ethers } from "ethers";
 
-import nftContract from "../constants/artifacts/NFT/FlappyOwlNftTestnet.sol/FlappyOwlNftTestnet.json"
-import governorContract from "../constants/artifacts/utils/FlappyOwlGovernor.sol/FlappyOwlGovernor.json"
-import liquidityPoolContract from "../constants/artifacts/governance/LiquidityPool.sol/LiquidityPool.json"
-import stakingPoolNFTContract from "../constants/artifacts/governance/NftStakingPool.sol/NftStakingPool.json"
+import { contractNftName, contractNftAbi } from "../constants/artifacts/NFT/FlappyOwlNftTestnet.sol/FlappyOwlNftTestnet"
+import { contractGovernanceName, contractGovernanceAbi} from "../constants/artifacts/utils/FlappyOwlGovernor.sol/FlappyOwlGovernor"
+import {contractLiquidityPoolName, contractLiquidityPoolAbi} from "../constants/artifacts/governance/LiquidityPool.sol/LiquidityPool"
+import {contractStakingPoolNftName, contractStakingPoolNftAbi} from "../constants/artifacts/governance/NftStakingPool.sol/NftStakingPool"
 
-import {
-    governorContractAddress,
-    liquidityPoolContractAddress,
-    stakingPoolNFTContractAddress,
-    nftContractAddress,
-    tokenContractAddress,
-    ownerAddress,
-    networkDeployedTo
-} from "../utils/contracts-config.js"
+import { contractOwner, tokenContract, nftContract, governorContract, liquidityPoolContract, stakingPoolNFTContract} from "../utils/contracts-config"
 import networksMap from "../utils/networksMap.json";
 
 import { useAccount, useChains, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract, } from "wagmi"

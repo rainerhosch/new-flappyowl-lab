@@ -9,7 +9,8 @@
     "verify": "npx hardhat verify --network sepolia --contract",
     "clean": "npx hardhat clean",
     "test": "npx hardhat test",
-    "setup": "npx hardhat run scripts/setup-controller.js"
+    "setup": "npx hardhat run scripts/setup-controller.js",
+    "genesis-mint": "npx hardhat run scripts/mint-genesis.js"
   },
   "dependencies": {
     "@chainlink/contracts": "^1.0.0",
