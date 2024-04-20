@@ -1,17 +1,17 @@
 import Badge from "../Common/Badge"
 import Image from 'next/image'
 
-const PortfolioCard = ({ data }) => {
+const NftCard = ({ data }) => {
     return (
         <div className="card_stylings overflow-hidden h-full">
             <Image
                 src={'/'+data?.image}
-                width={500}
-                height={500}
+                width={320}
+                height={320}
                 alt="portfolio img"
-                className="w-full object-cover opacity-30 h-32 sm:h-48 md:h-64"
+                className="w-full object-cover opacity-90 h-32 sm:h-48 md:h-64"
             />
-            <div id="arrow" className="py-2 px-6 card_stylings hover:-translate-y-10 transition-all ease-in-out duration-500">
+            <div id="arrow" className="py-2 px-6 card_stylings">
                 <div className="flex justify-between p-0 m-0 ">
                     <h3 className="mr-2 underline italic font-semibold pt-2 text-2xl text-Snow leading-tight sm:leading-normal">
                         <a 
@@ -22,7 +22,7 @@ const PortfolioCard = ({ data }) => {
                             {data?.projectName}
                         </a>
                     </h3>
-                    <div className="text-Snow transition duration-500 hover:text-yellow transform hover:-translate-y-1 hover:scale-110 pt-4 text-base">
+                    <div className="text-Snow  pt-4 text-base">
                         <a
                             href={data?.url}
                             target="_blank"
@@ -47,7 +47,7 @@ const PortfolioCard = ({ data }) => {
                         </a>
                     </div>
                 </div>
-                <p className="text-xs text-LightGray font-normal">
+                <p className="text-xs text-Blue font-normal">
                     {data?.projectDetail}
                 </p>
                 <div className="text-sm flex flex-wrap gap-3 py-2">
@@ -58,4 +58,4 @@ const PortfolioCard = ({ data }) => {
     )
 }
 
-export default PortfolioCard
+export default NftCard

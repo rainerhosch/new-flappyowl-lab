@@ -1,6 +1,6 @@
-import { http } from "wagmi"
+import { http, fallback, cookieStorage, createStorage } from "wagmi"
 import { sepolia } from "wagmi/chains"
-import { getDefaultConfig } from "@rainbow-me/rainbowkit"
+import { getDefaultConfig, getDefaultWallets } from "@rainbow-me/rainbowkit"
 import {
     metaMaskWallet,
     ledgerWallet,
@@ -10,14 +10,19 @@ import {
     coinbaseWallet,
     walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets"
+
+// const { wallets } = getDefaultWallets();
+// Get projectId at https://cloud.walletconnect.com
+export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID
 export const config = getDefaultConfig({
-    appName: "Flappyowl Testnet",
-    projectId: "YOUR_PROJECT_ID",
+    appName: "Flappyowl Vault",
+    projectId: projectId,
     wallets: [
+        // ...wallets,
         {
-            groupName: "Recommended",
+            groupName: "Other",
             wallets: [
-                // metaMaskWallet,
+                metaMaskWallet,
                 coinbaseWallet,
                 rainbowWallet,
                 // zerionWallet,
@@ -28,8 +33,17 @@ export const config = getDefaultConfig({
         },
     ],
     chains: [sepolia],
+    // transports: {
+    //     [sepolia.id]: fallback([
+    //         http(`https://sepolia.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`),
+    //         http(`https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`),
+    //     ]),
+    // },
     transports: {
         [sepolia.id]: http(),
     },
     ssr: true,
+    storage: createStorage({
+        storage: cookieStorage,
+    }),
 })

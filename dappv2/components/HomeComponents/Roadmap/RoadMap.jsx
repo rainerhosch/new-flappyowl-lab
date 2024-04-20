@@ -13,8 +13,8 @@ const RoadMap = () => {
     )
 
     return (
-        <div className="bg-RedSuprime">
-            <div className="px-2 md:px-8 py-4 text-lg font-bold text-Snow text-center">
+        <div className="bg-BluePastel">
+            <div className="px-2 md:px-8 py-4 text-lg font-bold text-Snow text-center font-mono">
                 Road Map
             </div>
             <div className="grid w-full h-full mt-5 justify-items-start gap-x-4 gap-y-4 px-2 md:px-8 pb-8">

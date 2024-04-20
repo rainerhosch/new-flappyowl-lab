@@ -1,10 +1,31 @@
-import Typewriter from "typewriter-effect"
-import BannerLayout from "../Common/BannerLayout"
-import Image from "next/image"
 import React, { useState, useEffect } from "react"
+// import { useSelector } from "react-redux";
+// import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query"
+import BannerLayout from "../components/Common/BannerLayout.jsx"
+import Footer from "../components/Footer.jsx"
+import PortfolioCard from "../components/Portfolio/PortfolioCard.jsx"
+// import type { NextPage } from 'next';
+import axios from "axios"
+// import { Skeleton } from "../components/Common/ParagraphSkeleton";
+import ImageAndParagraphSkeleton from "../components/Common/ImageAndParagraphSkeleton.jsx"
+import networksMap from "../utils/networksMap.json"
 import { ethers } from "ethers"
-import { useAccount, useChains, useChainId, useReadContract } from "wagmi"
-import { flappyOwlNftTestnetAbi, frcAbi, nftStakingPoolAbi, liquidityPoolAbi, flappyOwlGovernorAbi } from '../../src/smartcontract-abi'
+import {
+    useAccount,
+    useChains,
+    useChainId,
+    useReadContract,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from "wagmi"
+import {
+    flappyOwlNftTestnetAbi,
+    frcAbi,
+    nftStakingPoolAbi,
+    liquidityPoolAbi,
+    flappyOwlGovernorAbi,
+} from "../src/smartcontract-abi"
 import {
     governorContractAddress,
     liquidityPoolContractAddress,
@@ -12,17 +33,21 @@ import {
     nftContractAddress,
     tokenContractAddress,
     ownerAddress,
-    networkDeployedTo
-} from "../../utils/contracts_config.js"
+    networkDeployedTo,
+} from "../utils/contracts_config.js"
 
-const Banner = () => {
-    const [totalNftMinted, setTotalNftMinted] = useState(21000);
-    const [totalStakedNft, setTotalStakedNft] = useState(21000);
-    const [totalSupplyFRC, setTotalSupplyFRC] = useState("0");
-    const [isLoading, _setIsLoading] = useState(true)
+const liquidityStakingPool = () => {
+    const { address, isConnecting, isConnected, isDisconnected } = useAccount();
+    const chains = useChains()
+    const chainId = useChainId()
+    const [loading, setLoading] = useState(false)
+    const [totalNftMinted, setTotalNftMinted] = useState(21000)
+    const [totalStakedNft, setTotalStakedNft] = useState(21000)
+    const [totalSupplyFRC, setTotalSupplyFRC] = useState(0)
+    // const [isLoading, _setIsLoading] = useState(true)
 
-    function formatCurrency(_number){
-        return new Intl.NumberFormat('en-US').format(_number)
+    function formatCurrency(_number) {
+        return new Intl.NumberFormat("en-US").format(_number)
     }
 
     function nFormatter(num, digits) {
@@ -33,66 +58,72 @@ const Banner = () => {
             { value: 1e9, symbol: "G" },
             { value: 1e12, symbol: "T" },
             { value: 1e15, symbol: "P" },
-            { value: 1e18, symbol: "E" }
-        ];
-        const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
-        const item = lookup.findLast(item => num >= item.value);
-        return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
+            { value: 1e18, symbol: "E" },
+        ]
+        const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/
+        const item = lookup.findLast((item) => num >= item.value)
+        return item
+            ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol)
+            : "0"
     }
-
+    console.log(isConnected)
+    console.log(address)
+    // const { data: address } = useAccount();
     const { data: totalSupplyNft } = useReadContract({
         address: nftContractAddress,
         abi: flappyOwlNftTestnetAbi,
-        functionName: 'totalSupply',
-        watch:true
-    });
+        functionName: "totalSupply",
+        watch: true,
+    })
     const { data: _totalSupplyFRC } = useReadContract({
         address: tokenContractAddress,
         abi: frcAbi,
-        functionName: 'totalSupply',
-        watch:true
-    });
+        functionName: "totalSupply",
+        watch: true,
+    })
+    // useEffect(()=>{
+    //     if (address) {
+    //         setIsConnected(true)
+    //     }
+    // })
     useEffect(() => {
         if (_totalSupplyFRC) {
-            setTotalSupplyFRC(nFormatter(ethers.formatEther(_totalSupplyFRC), 4));
+            setTotalSupplyFRC(nFormatter(ethers.formatEther(_totalSupplyFRC), 4))
         }
-    }, [_totalSupplyFRC]);
+    }, [_totalSupplyFRC])
     useEffect(() => {
         if (totalSupplyNft) {
-        setTotalNftMinted(totalSupplyNft.toString());
+            setTotalNftMinted(totalSupplyNft.toString())
         }
-    }, [totalSupplyNft]);
-    // console.log('Total Minted: '+totalNftMinted)
+    }, [totalSupplyNft])
+    // const { addToast } = useToasts()
+
+    // console.log(isConnecting)
+
+    const { isLoading, error, data } = useQuery(["portfolio"], async () =>
+        axios
+            .get("api/portfolio")
+            .then(({ data }) => data)
+            .catch((error) => console.error("Error fetching testimonials:", error)),
+    )
     return (
-        <BannerLayout>
-            <div className="absolute inset-0 z-20 flex flex-col items-center py-6 justify-center w-full h-full bg-gradient-to-t from-BluePastel">
+        <>
+            <div className="mt-5 flex flex-col items-center py-2 justify-center bg-gradient-to-t from-BluePastel">
                 <div className="bg-SnowTransparent w-[95%] h-[95%] px-4 py-2 rounded-xl overflow-hidden flex md:block">
                     <div className="flex sm:content-center md:items-center md:justify-around">
                         <div className="">
                             <div className="">
-                                <h1 className="text-2xl sm:text-4xl xl:text-5xl text-Snow font-bold">
-                                    NFT Yeild Farm Solution.
+                                <h1 className="text-2xl sm:text-4xl xl:text-5xl text-Snow font-bold font-mono">
+                                    Liquidity Staking Pool
                                 </h1>
                             </div>
-
                             <div className="mt-3">
                                 <p className="text-sm sm:text-2x1 xl:text-lg text-Snow font-medium font-mono">
-                                    Discover, collect, and earn $FRC with stake your Nft, on our
-                                    vault.
-                                </p>
-                            </div>
-                            <div className="md:hidden">
-                                <p className="text-sm sm:text-md xl:text-lx text-Snow font-medium font-mono text-left">
-                                    POWERED BY OP STACK
+                                    Earn $FRC with staking liquidity position
                                 </p>
                             </div>
                         </div>
                         <div className="hidden md:block w-48 h-52 relative">
-                            <div className="">
-                                <p className="text-sm sm:text-md xl:text-lx text-Snow font-medium font-mono text-right">
-                                    POWERED BY OP STACK
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,17 +150,17 @@ const Banner = () => {
 
                         <div className="flex items-center gap-x-1">
                             <span className="text-base md:text-lg text-White font-bold font-mono col-span-2">
-                            {totalSupplyFRC}
+                                {totalSupplyFRC}
                             </span>
                             <span className="text-xs md:text-sm text-MidNightBlack font-medium font-mono col-span-2">
-                                $FRC 
+                                $FRC
                                 {/* <a className="small:hidden">Total Supply</a> */}
                             </span>
                         </div>
 
                         <div className="flex items-center gap-x-1">
                             <span className="text-base md:text-lg text-White font-bold font-mono">
-                                {nFormatter((21000000*60)/100, 4)}
+                                {nFormatter((21000000 * 60) / 100, 4)}
                             </span>
                             <span className="text-xs md:text-sm text-MidNightBlack font-medium font-mono">
                                 $FRC Airdrop
@@ -138,8 +169,17 @@ const Banner = () => {
                     </div>
                 </div>
             </div>
-        </BannerLayout>
+
+            <div className="bg-BluePastel grid justify items-center grid-flow-row md:grid-cols-4 grid-rows-auto gap-4 px-8 my-6">
+                {isLoading
+                    ? [1, 2, 3, 4, 5].map((x) => (
+                        <ImageAndParagraphSkeleton key={x} dataClass={"w-full object-cover"} />
+                        ))
+                    : data?.map((data, key) => <PortfolioCard key={key} data={data} />)}
+            </div>
+            <Footer />
+        </>
     )
 }
 
-export default Banner
+export default liquidityStakingPool

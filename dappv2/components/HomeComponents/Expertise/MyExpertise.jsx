@@ -154,10 +154,10 @@ const MyExpertise = () => {
 
     return (
         <>
-            <div className="px-2 md:px-8 py-4 text-lg font-bold text-Snow text-center bg-RedSuprimeDark">
+            <div className="px-2 md:px-8 py-4 text-lg font-bold text-Snow text-center bg-BluePastel font-mono">
                 Recent Minted
             </div>
-            <div className="justify-items-center mb-24  bg-RedSuprimeDark">
+            <div className="justify-items-center mb-24 bg-BluePastel">
                 <div className="text-center">
                     <div>
                         <h2 className="text-[#fff] font-900 text-center">
@@ -216,7 +216,7 @@ const MyExpertise = () => {
                         </p>
                     </span>
                 </div>
-                <div className="bg-[#2a2626]">
+                <div className="bg-gradient-to-b from-blue-500">
                     <div className="row p-3 text-center text-Snow">
                         <h3 className="font-bold font-mono">21M INITIAL SUPPLY $FRC ALLOCATION</h3>
                     </div>

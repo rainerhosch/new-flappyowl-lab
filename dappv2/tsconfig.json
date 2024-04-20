@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "components/HomeComponents/Expertise/MyExpertise.jsx"  ],
+, "components/HomeComponents/Expertise/MyExpertise.jsx", "pages/vault.jsx", "components/Common/Nav/Nav.jsx"  ],
   "exclude": [
     "node_modules"
   ]

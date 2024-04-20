@@ -5,7 +5,7 @@ import Image from "next/image"
 const RoadmapCard = ({ data }) => {
     return (
         <CardLayout>
-            <div className="p-8 h-full relative card_stylings transition">
+            <div className="bg-NavLink/60 p-8 h-full relative card_stylings transition">
                 <Image
                     width={64}
                     height={64}
@@ -13,18 +13,18 @@ const RoadmapCard = ({ data }) => {
                     alt="Photod"
                     className="absolute z-10 right-10 -top-5 border-Snow w-16 h-16  border-[3px] rounded-full m-0"
                 />
-                <div className=" text-Snow font-mono ">{data?.tittle}</div>
-                <div className="text-xs text-LightGray italic mt-1 font-mono">
+                <div className=" text-Snow text-sm  font-mono ">{data?.tittle}</div>
+                <div className="text-xs text-Snow italic mt-1 font-mono">
                     {/* {data?.time} */}
                 </div>
-                <div className="text-sm mt-2 text-LightGray font-mono">
+                <div className="text-xs mt-2 text-Snow font-mono">
                     {data.task?.map((task) => (
                         <li key={task.id}>
                             {task.task_name}
                             {task.task_status === 1 ? (
-                                <span className="inline-block h-5 w-5 text-[#00e1ff83]">
+                                <span className="text-xs inline-block h-5 w-5 text-NavLink/50">
                                     <svg
-                                        className="h-5 w-5"
+                                        className="h-3.5 w-3.5"
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
                                     >
@@ -36,9 +36,9 @@ const RoadmapCard = ({ data }) => {
                                     </svg>
                                 </span>
                             ) : task.task_status === 2 ? (
-                                <i className="text-[#b3ff2767]">&nbsp;&nbsp;On Progress</i>
+                                <i className="text-xs text-NavLink">&nbsp;&nbsp;On Progress</i>
                             ) : (
-                                <i className="text-[#55555567]">&nbsp;&nbsp;Soon</i>
+                                <i className="text-xs text-NavLink/50">&nbsp;&nbsp;Soon</i>
                             )}
                         </li>
                     ))}

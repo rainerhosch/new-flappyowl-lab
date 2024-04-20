@@ -1,4 +1,5 @@
-export const NAME = "FlappyOwl Lab";
+export const NAME = "FlappyOwl";
+export const SUBNAME = "Foundation";
 
 export const DESIGNATION = `NFT, Collectible, Yeild Farm, Stak, Earn, Community`;
 

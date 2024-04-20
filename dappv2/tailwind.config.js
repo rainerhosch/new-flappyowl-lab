@@ -21,7 +21,11 @@ module.exports = {
         RedSuprime:"#ff2a2a",
         RedSuprime2:"#ef3333",
         RedSuprimeDark:"#db0000",
-        Rose:"#ff8787"
+        Rose:"#ff8787",
+        BlueBase:"#1054ff",
+        BlueSoft:"#346dff",
+        BluePastel:"#436cff",
+        NavLink:"#91b0ff",
       },
       fontFamily: {
         'cascadia-normal': ['cascadia-normal'],

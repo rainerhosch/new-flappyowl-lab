@@ -2,6 +2,10 @@ import React, { useEffect } from "react"
 import * as echarts from "echarts"
 
 const Piechart = () => {
+    const FontTitleColor = "rgba(60, 131, 255, 1)"
+    const legendFontColor = "rgba(255, 255, 255, 0.764)"
+    const seriesFontColor = "rgba(204, 204, 204, 1)"
+    const emphasisFontColor = "rgba(108, 108, 108, 1)"
     useEffect(() => {
         // Initialize ECharts instance
         const chart = echarts.init(document.getElementById("echarts-chart"))
@@ -14,7 +18,7 @@ const Piechart = () => {
                 left: "center",
                 textStyle: {
                     fontSize: 30,
-                    color: "rgba(255, 42, 42, 1)",
+                    color: FontTitleColor,
                     fontFamily: "monospace",
                 },
             },
@@ -27,7 +31,7 @@ const Piechart = () => {
                 left: "center",
                 textStyle: {
                     fontSize: 12,
-                    color: "rgba(255, 42, 42, 1)",
+                    color: legendFontColor,
                     fontWeight: "bold",
                     fontFamily: "monospace",
                 },
@@ -39,37 +43,37 @@ const Piechart = () => {
                     radius: "70%",
                     data: [
                         {
-                            value: 30,
+                            value: 75,
                             name: "Public Sale",
                             label: {
-                                color: "rgba(255, 42, 42, 1)",
-                                fontWeight: "bold",
-                                fontFamily: "monospace",
-                            },
-                        },
-                        {
-                            value: 45,
-                            name: "Ecosystem Partner",
-                            label: {
-                                color: "rgba(255, 42, 42, 1)",
+                                color: seriesFontColor,
                                 fontWeight: "bold",
                                 fontFamily: "monospace",
                             },
                         },
                         {
                             value: 8,
-                            name: "Initial Liquidity",
+                            name: "Partner Ecosystem",
                             label: {
-                                color: "rgba(255, 42, 42, 1)",
+                                color: seriesFontColor,
                                 fontWeight: "bold",
                                 fontFamily: "monospace",
                             },
                         },
+                        // {
+                        //     value: 45,
+                        //     name: "Initial Liquidity",
+                        //     label: {
+                        //         color: seriesFontColor,
+                        //         fontWeight: "bold",
+                        //         fontFamily: "monospace",
+                        //     },
+                        // },
                         {
                             value: 12,
                             name: "Airdrop",
                             label: {
-                                color: "rgba(255, 42, 42, 1)",
+                                color: seriesFontColor,
                                 fontWeight: "bold",
                                 fontFamily: "monospace",
                             },
@@ -78,7 +82,7 @@ const Piechart = () => {
                             value: 5,
                             name: "Foundation",
                             label: {
-                                color: "rgba(255, 42, 42, 1)",
+                                color: seriesFontColor,
                                 fontWeight: "bold",
                                 fontFamily: "monospace",
                             },
@@ -92,7 +96,7 @@ const Piechart = () => {
                         itemStyle: {
                             shadowBlur: 10,
                             shadowOffsetX: 0,
-                            shadowColor: "rgba(255, 42, 42, 1)",
+                            shadowColor: emphasisFontColor,
                         },
                     },
                 },
