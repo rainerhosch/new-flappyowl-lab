@@ -22,7 +22,7 @@ const Nav = ({ setIsOpen, isOpen }) => {
                 >
                     <ImCross />
                 </div>
-                <div className="flex flex-col gap-y-2 px-6 w-full transition">
+                <div className="flex flex-col gap-y-2 px-6 w-full transition lg:grid grid-cols-6 gap-3">
                     <nav>
                         <ul>
                             <NavItem

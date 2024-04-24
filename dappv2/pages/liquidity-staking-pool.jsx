@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import BannerLayout from "../components/Common/BannerLayout.jsx"
 import Footer from "../components/Footer.jsx"
-import PortfolioCard from "../components/Portfolio/PortfolioCard.jsx"
+import NftCard from "../components/NFTStakingPool/NftCard.jsx"
 // import type { NextPage } from 'next';
 import axios from "axios"
 // import { Skeleton } from "../components/Common/ParagraphSkeleton";
@@ -175,7 +175,7 @@ const liquidityStakingPool = () => {
                     ? [1, 2, 3, 4, 5].map((x) => (
                         <ImageAndParagraphSkeleton key={x} dataClass={"w-full object-cover"} />
                         ))
-                    : data?.map((data, key) => <PortfolioCard key={key} data={data} />)}
+                    : data?.map((data, key) => <NftCard key={key} data={data} />)}
             </div>
             <Footer />
         </>
